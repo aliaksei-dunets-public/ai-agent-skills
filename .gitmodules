@@ -1,0 +1,6 @@
+[submodule "abap-skills-core"]
+	path = abap-skills-core
+	url = https://github.com/aliaksei-dunets-public/abap-skills-core.git
+[submodule "anthropic-skills"]
+	path = anthropic-skills
+	url = git@github.com:anthropics/skills.git
