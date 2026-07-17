@@ -6,6 +6,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -21,9 +22,14 @@ STATUS_TRANSITIONS = {
 
 
 def _atomic_write(path: Path, content: str) -> None:
-    temporary = path.with_name(f".{path.name}.tmp")
-    temporary.write_text(content, encoding="utf-8", newline="\n")
-    temporary.replace(path)
+    fd, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    os.close(fd)
+    temporary = Path(temporary_name)
+    try:
+        temporary.write_text(content, encoding="utf-8", newline="\n")
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def _set_frontmatter_value(content: str, key: str, value: str) -> str:
@@ -106,8 +112,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--tasks-root",
         type=Path,
-        default=Path.cwd() / "docs" / "plan",
-        help="Task store root containing open/ and close/ (default: ./docs/plan)",
+        default=Path.cwd() / ".ai" / "task-manager",
+        help="Task store root containing open/ and close/ (default: ./.ai/task-manager)",
     )
     args = parser.parse_args(argv)
 
@@ -141,17 +147,17 @@ def main(argv: list[str] | None = None) -> int:
         metadata = parse_frontmatter(target)
         current_status = metadata["status"]
 
-        is_archive = bool(update_data.get("archive"))
-        if target.parent.name == "close" and not is_archive:
+        is_close = bool(update_data.get("close", update_data.get("archive")))
+        if target.parent.name == "close" and not is_close:
             raise ValueError("close tasks are immutable")
         
-        if is_archive:
+        if is_close:
             if target != open_path:
                 raise ValueError("only open tasks can be closed")
             if close_path.exists():
                 raise FileExistsError(f"close task already exists: {close_path}")
             if current_status != "approved":
-                raise ValueError(f"archive requires status approved, got {current_status}")
+                raise ValueError(f"close requires status approved, got {current_status}")
             _validate_completion(content)
             requested_status = "done"
         else:
@@ -179,7 +185,7 @@ def main(argv: list[str] | None = None) -> int:
         if requested_state is not None:
             content = _set_frontmatter_value(content, "execution_state", requested_state)
             
-        if is_archive:
+        if is_close:
             content = _set_frontmatter_value(content, "execution_state", "ready")
 
         now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -203,7 +209,7 @@ def main(argv: list[str] | None = None) -> int:
             content = _append_to_section(content, "Completed work", update_data["completed_work"])
 
         _atomic_write(target, content)
-        if is_archive:
+        if is_close:
             target.replace(close_path)
             try:
                 subprocess.run(

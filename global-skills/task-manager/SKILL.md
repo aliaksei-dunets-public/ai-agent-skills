@@ -4,7 +4,8 @@ description: >-
   Manage the repository task source for the development-orchestrator lifecycle:
   create and select tasks, validate dependencies, update execution metadata,
   record work, and close completed tasks. Use only for explicit task-management
-  operations or when invoked by development-orchestrator.
+  operations, approved plan registration, or when invoked by
+  development-orchestrator.
 ---
 
 # Task Manager
@@ -14,20 +15,24 @@ description: >-
 The operational task source is split into open and close indexes and detailed
 task files:
 
-- open index: `docs/plan/open-tasks.md` (auto-generated)
-- open details: `docs/plan/open/TASK-XXXX.md` or
-  `docs/plan/open/YYYY-MM-DD-<feature-name>.md`
-- close index: `docs/plan/close/close-tasks.md` (auto-generated)
-- close details: `docs/plan/close/TASK-XXXX.md` or
-  `docs/plan/close/YYYY-MM-DD-<feature-name>.md`
+- open index: `.ai/task-manager/open-tasks.md` (auto-generated)
+- open details: `.ai/task-manager/open/TASK-XXXX.md`
+- close index: `.ai/task-manager/close-tasks.md` (auto-generated)
+- close details: `.ai/task-manager/close/TASK-XXXX.md`
 
-The task ID in frontmatter remains the stable identity even when a detail file
-uses the date-feature filename. `docs/plan/` is the default task root; pass
+The task ID in frontmatter and filename is the stable identity. The
+`.ai/task-manager/` directory is the default task root; pass
 `--tasks-root` when the project uses another location.
 
 Do not create a second backlog from another roadmap or silently migrate its
 checklist items. A plan becomes an operational task only through the create
 operation.
+
+## Script invocation
+
+The source package keeps utilities in `scripts/`; the installed
+development-orchestrator layout exposes them as `.ai/scripts/`. Run them from
+the project root.
 
 ## Task contract
 
@@ -55,10 +60,14 @@ Never replace a primary status with an execution state.
 ## Operations
 
 1. For a create operation, use `create_task.py`. It assigns a unique task ID,
-   creates a date-feature detail file in `open/`, and regenerates both indexes.
-2. For selection, choose an explicitly requested task, or the first
-   dependency-ready `created` task by priority and creation date. Use
-   `sync_tasks.py --select-next` for deterministic selection.
+   creates `open/TASK-XXXX.md`, adds a link to the implementation plan in
+   `docs/plans/`, and regenerates both indexes.
+   Example: `python .ai/scripts/create_task.py --title "Feature name" --plan
+   docs/plans/YYYY-MM-DD-feature-name.md`.
+2. For selection, use an explicitly requested task or
+   `sync_tasks.py --select-next`, which returns the first dependency-ready
+   `created` task by priority and creation date. `NONE` means no task is ready;
+   do not start a task from a stale index.
 3. Before starting work, validate the task's objective, scope, acceptance
    criteria, plan, and completed dependencies.
 4. For a start operation, atomically set `status: in_progress`,
@@ -105,17 +114,20 @@ To close a task after all completion evidence is present:
 
 ```json
 {
-  "archive": true
+  "close": true
 }
 ```
+
+`"archive": true` is accepted as a legacy alias for `"close": true`.
 
 The utility never stages or commits Git changes. The caller owns any repository
 commit required by the project workflow before closing a task. Never edit
 `open-tasks.md` or `close-tasks.md` manually.
 
-If a required stage fails, keep the primary status unchanged and set
-`execution_state: blocked` with a concrete blocker. Do not bypass review limits,
-approval, dependency checks, or close validation.
+If a required stage fails, keep the primary status unchanged and record a
+concrete blocker with `execution_state: blocked` through the update utility;
+return its error as evidence. Do not repair records manually or bypass review,
+approval, dependency, or close validation.
 
 ## Side-effect boundary
 

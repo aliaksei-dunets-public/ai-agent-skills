@@ -30,20 +30,20 @@ Use this mode when the user explicitly wants ideation or design exploration.
 3. Propose 2–3 viable approaches with trade-offs and a recommendation.
 4. Present the design in reviewable sections. Cover architecture, components,
    data flow, error handling, and testing at a level proportional to scope.
-5. Get user approval before implementation. If a section is rejected, revise
-   it and continue the discussion; do not move to planning prematurely.
+5. Get user approval for the proposed design. If a section is rejected, revise
+   it before continuing; do not implement or plan prematurely.
 6. After approval, write the validated design to
    `docs/design/YYYY-MM-DD-<topic>-design.md`.
-7. Self-review the spec and fix issues in place:
+7. Self-review the written spec and fix issues in place:
    - no `TBD`, `TODO`, placeholders, or vague requirements;
    - no contradictions between requirements, architecture, and behavior;
    - scope fits one implementation plan;
    - ambiguous choices are made explicit.
    If a separate spec reviewer is available, use
    `references/spec-document-reviewer-prompt.md` for that review.
-8. Ask the user to review the written spec. Incorporate requested changes and
-   repeat the self-review before planning.
-9. Once the spec is approved, switch to Planning mode and read
+8. Ask the user to review the written spec. Incorporate changes and repeat the
+   self-review; explicit approval of the written spec is the final gate.
+9. Once approved, switch to Planning mode and read
    `references/writing-plans.md`.
 
 Do not require a design conversation for a task that is already accompanied by
@@ -56,9 +56,9 @@ Do not ask routine discovery questions if the repository, task, or approved
 spec already answers them. Ask only when a missing decision would materially
 change scope, behavior, or safety.
 
-1. Read the approved spec or requirements. If none exists, derive a compact
-   design from the user request and repository evidence; record assumptions
-   that materially affect implementation.
+1. Read the approved spec or requirements. If none exists, use the user's
+   explicit planning request as requirements input; derive a compact design
+   from it and repository evidence, recording material assumptions.
 2. Inspect the current project before defining work: relevant files, tests,
    interfaces, configuration, docs, and established patterns.
 3. Check scope. Split independent subsystems into separate plans or state the
@@ -67,7 +67,7 @@ change scope, behavior, or safety.
    task structure, step granularity, exact commands, and self-review rules.
    Treat it as the local planning reference, not as a separate skill to invoke.
 5. Create the plan at
-   `docs/plans/open/YYYY-MM-DD-<feature-name>.md`, unless the user gave a
+   `docs/plans/YYYY-MM-DD-<feature-name>.md`, unless the user gave a
    different location.
 6. Make every task independently actionable and testable. Include exact file
    paths, interfaces, implementation details, tests, expected results, and
@@ -75,9 +75,11 @@ change scope, behavior, or safety.
 7. Self-review the finished plan for spec coverage, scope, placeholders, and
    cross-task type/interface consistency.
 8. If the project or active environment provides a `task-manager` skill, invoke
-   it to create a new task for the plan you just created. Pass the plan path and
-   its goal; do not duplicate the plan contents in the task. If `task-manager`
-   is unavailable, continue without installing or inventing one and report that
+   its create operation to create a new task for the plan you just created.
+   Pass the plan path as the task's `--plan` value and the plan goal as its
+   `--title` value; let `task-manager` allocate the task ID and filename. Do
+   not duplicate the plan contents in the task. If `task-manager` is
+   unavailable, continue without installing or inventing one and report that
    task creation was skipped.
 9. Return the plan path, material assumptions, validation commands, task-manager
    result, and any blocking decisions. Do not implement the plan in this mode.

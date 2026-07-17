@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -10,17 +9,12 @@ from pathlib import Path
 from sync_tasks import TASK_ID_RE, load_tasks
 
 
-def slugify(value: str) -> str:
-    slug = re.sub(r"[^A-Za-z0-9]+", "-", value.strip()).strip("-").lower()
-    return slug or "task"
-
-
 def next_task_id(open_tasks: list[dict[str, str]], close_tasks: list[dict[str, str]]) -> str:
     numbers = [int(task["id"].split("-", 1)[1]) for task in open_tasks + close_tasks if TASK_ID_RE.fullmatch(task["id"])]
     return f"TASK-{max(numbers, default=0) + 1:04d}"
 
 
-def task_content(*, task_id: str, title: str, task_type: str, priority: str, now: str, plan: str, dependencies: str) -> str:
+def task_content(*, task_id: str, title: str, task_type: str, priority: str, now: str, plan_link: str, dependencies: str) -> str:
     return f"""---
 id: {task_id}
 title: {title!r}
@@ -44,7 +38,7 @@ dependencies: {dependencies or 'none'}
 - The implementation satisfies the approved plan and its validation steps.
 
 ### Implementation plan
-- Source plan: {plan}
+- Source plan: {plan_link}
 
 ### Review history
 none
@@ -72,7 +66,7 @@ none
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Create a task in docs/plan/open and regenerate indexes.")
+    parser = argparse.ArgumentParser(description="Create a task in .ai/task-manager/open and regenerate indexes.")
     parser.add_argument("--title", required=True, help="Task title")
     parser.add_argument("--plan", required=True, help="Path to the approved implementation plan")
     parser.add_argument("--type", default="feature", dest="task_type")
@@ -82,8 +76,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--tasks-root",
         type=Path,
-        default=Path.cwd() / "docs" / "plan",
-        help="Task store root containing open/ and close/ (default: ./docs/plan)",
+        default=Path.cwd() / ".ai" / "task-manager",
+        help="Task store root containing open/ and close/ (default: ./.ai/task-manager)",
     )
     args = parser.parse_args(argv)
 
@@ -92,6 +86,16 @@ def main(argv: list[str] | None = None) -> int:
     close_dir = tasks_root / "close"
     path: Path | None = None
     try:
+        plan_path = Path(args.plan)
+        if not plan_path.is_absolute():
+            plan_path = Path.cwd() / plan_path
+        plan_path = plan_path.resolve()
+        if not plan_path.is_file():
+            raise ValueError(f"implementation plan does not exist: {args.plan}")
+        project_root = Path.cwd().resolve()
+        plan_relative = plan_path.relative_to(project_root)
+        if plan_relative.parts[:2] != ("docs", "plans"):
+            raise ValueError("implementation plan must be inside docs/plans/")
         open_tasks = load_tasks(open_dir, closed=False)
         close_tasks = load_tasks(close_dir, closed=True)
         task_id = args.task_id or next_task_id(open_tasks, close_tasks)
@@ -100,18 +104,16 @@ def main(argv: list[str] | None = None) -> int:
         if any(task["id"] == task_id for task in open_tasks + close_tasks):
             raise ValueError(f"task id already exists: {task_id}")
 
-        date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        base = f"{date}-{slugify(args.title)}"
-        filename = f"{base}.md"
-        suffix = 2
-        while (open_dir / filename).exists() or (close_dir / filename).exists():
-            filename = f"{base}-{suffix}.md"
-            suffix += 1
+        filename = f"{task_id}.md"
+        if (open_dir / filename).exists() or (close_dir / filename).exists():
+            raise ValueError(f"task filename already exists: {filename}")
 
         open_dir.mkdir(parents=True, exist_ok=True)
         close_dir.mkdir(parents=True, exist_ok=True)
         path = open_dir / filename
         now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        display_plan = plan_relative.as_posix()
+        markdown_plan = Path("../..") / plan_relative
         with path.open("x", encoding="utf-8", newline="\n") as handle:
             handle.write(task_content(
                 task_id=task_id,
@@ -119,7 +121,7 @@ def main(argv: list[str] | None = None) -> int:
                 task_type=args.task_type,
                 priority=args.priority,
                 now=now,
-                plan=args.plan,
+                plan_link=f"[{display_plan}]({markdown_plan.as_posix()})",
                 dependencies=args.dependencies,
             ))
         subprocess.run(

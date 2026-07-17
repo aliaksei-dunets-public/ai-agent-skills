@@ -66,21 +66,22 @@ none
 class TaskScriptTests(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name) / "docs" / "plan"
+        self.root = Path(self.tmp.name) / ".ai" / "task-manager"
         (self.root / "open").mkdir(parents=True)
         (self.root / "close").mkdir()
-        (self.root / "open" / "2026-07-13-script-lifecycle.md").write_text(TASK, encoding="utf-8")
+        (self.root / "open" / "TASK-9000.md").write_text(TASK, encoding="utf-8")
         self.run_script(SYNC, "--tasks-root", self.root)
 
     def tearDown(self) -> None:
         self.tmp.cleanup()
 
-    def run_script(self, script: Path, *args: object, check: bool = True) -> subprocess.CompletedProcess[str]:
+    def run_script(self, script: Path, *args: object, check: bool = True, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             [sys.executable, str(script), *(str(arg) for arg in args)],
             check=check,
             capture_output=True,
             text=True,
+            cwd=cwd,
         )
 
     def apply(self, payload: dict[str, object], task_id: str = "TASK-9000", check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -95,19 +96,23 @@ class TaskScriptTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("stale", result.stderr)
 
-    def test_create_uses_date_filename_and_selects_task(self) -> None:
-        result = self.run_script(CREATE, "--title", "Add API cache", "--plan", "docs/plans/cache.md", "--tasks-root", self.root)
+    def test_create_uses_task_filename_links_plan_and_selects_task(self) -> None:
+        plan = Path(self.tmp.name) / "docs" / "plans" / "cache-plan.md"
+        plan.parent.mkdir(parents=True)
+        plan.write_text("# Cache plan", encoding="utf-8")
+        result = self.run_script(CREATE, "--title", "Add API cache", "--plan", "docs/plans/cache-plan.md", "--tasks-root", self.root, cwd=Path(self.tmp.name))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("TASK-9001", result.stdout)
-        created = list((self.root / "open").glob("202*-add-api-cache.md"))
+        created = list((self.root / "open").glob("TASK-9001.md"))
         self.assertEqual(len(created), 1)
+        self.assertIn("[docs/plans/cache-plan.md](../../docs/plans/cache-plan.md)", created[0].read_text(encoding="utf-8"))
         selected = self.run_script(SYNC, "--tasks-root", self.root, "--select-next")
         self.assertIn("TASK-9000", selected.stdout)
         self.assertIn("open", selected.stdout)
 
     def test_missing_dependency_fails_validation(self) -> None:
         invalid = TASK.replace("TASK-9000", "TASK-9001").replace("dependencies: none", "dependencies: TASK-9999")
-        (self.root / "open" / "2026-07-14-invalid-dependency.md").write_text(invalid, encoding="utf-8")
+        (self.root / "open" / "TASK-9001.md").write_text(invalid, encoding="utf-8")
         result = self.run_script(SYNC, "--tasks-root", self.root, "--check", check=False)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("does not exist", result.stderr)
@@ -118,7 +123,7 @@ class TaskScriptTests(unittest.TestCase):
         rejected = self.apply({"status": "approved"}, check=False)
         self.assertNotEqual(rejected.returncode, 0)
         self.apply({"approve": True, "review": "User approved"})
-        content = (self.root / "open" / "2026-07-13-script-lifecycle.md").read_text(encoding="utf-8")
+        content = (self.root / "open" / "TASK-9000.md").read_text(encoding="utf-8")
         self.assertIn("status: approved", content)
         self.assertIn("- Approved: yes", content)
 
@@ -131,10 +136,10 @@ class TaskScriptTests(unittest.TestCase):
             "documentation_evidence": "Task documentation updated",
             "completed_work": "Lifecycle implementation completed",
         })
-        result = self.apply({"archive": True})
+        result = self.apply({"close": True})
         self.assertIn("Closed TASK-9000", result.stdout)
-        self.assertFalse((self.root / "open" / "2026-07-13-script-lifecycle.md").exists())
-        closed = self.root / "close" / "2026-07-13-script-lifecycle.md"
+        self.assertFalse((self.root / "open" / "TASK-9000.md").exists())
+        closed = self.root / "close" / "TASK-9000.md"
         self.assertTrue(closed.exists())
         self.assertIn("status: done", closed.read_text(encoding="utf-8"))
         self.assertEqual(self.run_script(SYNC, "--tasks-root", self.root, "--check").returncode, 0)

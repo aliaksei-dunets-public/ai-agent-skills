@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import sys
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -159,7 +161,7 @@ def generate_markdown_table(tasks: list[dict[str, str]], *, active: bool) -> str
     for task in tasks:
         folder = "open" if active else "close"
         filename = Path(task["_path"]).name
-        link = f"[Details]({folder}/{filename})" if active else f"[Details]({filename})"
+        link = f"[Details]({folder}/{filename})"
         lines.append(
             "| "
             + " | ".join(
@@ -172,9 +174,14 @@ def generate_markdown_table(tasks: list[dict[str, str]], *, active: bool) -> str
 
 
 def _atomic_write(path: Path, content: str) -> None:
-    temporary = path.with_name(f".{path.name}.tmp")
-    temporary.write_text(content, encoding="utf-8", newline="\n")
-    temporary.replace(path)
+    fd, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    os.close(fd)
+    temporary = Path(temporary_name)
+    try:
+        temporary.write_text(content, encoding="utf-8", newline="\n")
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def write_indexes(tasks_dir: Path, active_tasks: list[dict[str, str]], completed_tasks: list[dict[str, str]]) -> None:
@@ -224,8 +231,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--tasks-root",
         type=Path,
-        default=Path.cwd() / "docs" / "plan",
-        help="Task store root containing open/ and close/ (default: ./docs/plan)",
+        default=Path.cwd() / ".ai" / "task-manager",
+        help="Task store root containing open/ and close/ (default: ./.ai/task-manager)",
     )
     parser.add_argument("--check", action="store_true", help="Validate records without writing indexes")
     parser.add_argument("--select-next", action="store_true", help="Print the first dependency-ready open task")
