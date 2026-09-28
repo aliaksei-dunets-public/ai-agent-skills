@@ -1,56 +1,39 @@
-# Severity and Confidence
+# Severity, Evidence, and Gate Policy
 
-Use severity for impact and exploitability; use confidence for evidentiary certainty. Do not inflate severity because a scanner labels an issue broadly.
+Rate actual impact and attack prerequisites. A scanner's CVSS rating describes its advisory, not automatically the application's exposure. Severity and confidence are separate fields.
 
-## Critical
+| Severity | Contextual examples |
+|---|---|
+| Critical | Broad unauthenticated code execution, universal account takeover, mass sensitive-data compromise, broadly privileged production signing/admin credential exposure. |
+| High | Sensitive cross-user/tenant access, command/SQL injection with serious impact, privilege escalation, privileged CI execution, exploitable deserialization or internal SSRF. |
+| Medium | Demonstrated bounded exposure or abuse, meaningful misconfiguration, replay with limited impact. |
+| Low | Low-impact issue or evidence-backed defense-in-depth weakness. |
+| Informational | Non-vulnerable observation, applicable future control, or coverage note. |
 
-Typical examples:
+Do not automatically classify all SQL injection as Critical, all authenticated issues as Medium, all wildcard CORS as vulnerable, or all root containers as Medium. Determine reachable assets, identity/credentials, permissions, and deployment assumptions. A placeholder token is not an exposed live credential; a hardcoded placeholder used as a real signing key can still be a vulnerability.
 
-- likely-valid production private key, cloud root/admin credential, signing key, or broadly privileged token;
-- unauthenticated remote code execution;
-- authentication bypass or universal account takeover;
-- cross-tenant or mass sensitive-data compromise with little attacker effort;
-- software-supply-chain execution path affecting downstream users/releases.
+## Confidence and Classification
 
-## High
+- **High:** the relevant path/asset and missing control are established. For dependencies, an exact affected version can be confirmed independently of exploitability.
+- **Medium:** evidence is strong but a specific runtime, configuration, or reachability fact is missing. State that fact and a verification step.
+- **Low:** weak or pattern-only evidence. Omit generic guesses; retain only concrete useful observations with their limitations.
 
-Typical examples:
+Put unverified claims in **Potential risks / Needs verification**, not in confirmed findings. Keep an affected dependency's advisory severity and application reachability separate. Do not reduce impact just because certainty is low.
 
-- exploitable SQL/command/template injection;
-- broken object authorization exposing or modifying sensitive records;
-- privilege escalation;
-- SSRF reaching sensitive internal services or metadata credentials;
-- unsafe deserialization with code execution or serious integrity impact;
-- new vulnerable dependency with High/Critical advisory and reachable/plausible use;
-- CI workflow that exposes secrets to untrusted code or grants privileged write/deploy capability.
+## Gate Rules (Apply in This Order)
 
-## Medium
+1. **FAIL** if the applicable scope contains a confirmed High/Critical vulnerability, a likely real exposed credential/private key, or a High/Critical affected dependency with evidenced reachable/plausible vulnerable use. Classify secrets from format and context without attempting authentication. A changed control that creates a demonstrated serious exposure is a finding; a tool being disabled alone does not prove exploitation.
+2. Otherwise **WARN** for confirmed Medium issues, material unverified risks (including unresolved High/Critical dependency reachability), or material coverage gaps/errors. Missing tools for applicable categories, unsupported components, stale/unavailable advisory data, an incomplete snapshot, and unresolved conflicts are gaps. A no-findings scanner crash is not PASS.
+3. Otherwise **PASS**, permitting Low/Informational observations. All applicable categories must have adequate documented coverage; mark a category N/A only with a concrete reason. Manual contextual source review is useful but does not silently replace missing automated SAST or dependency coverage.
 
-Typical examples:
+An empty explicitly requested staged review yields WARN / “nothing staged; no commit content assessed.” In project mode an empty index does not stop the project audit; show the staged gate as N/A. For non-Git full/project reviews, absent Git metadata alone is not a coverage failure.
 
-- exploitable issue requiring authentication, unusual configuration, or constrained impact;
-- sensitive data exposure limited in scope;
-- meaningful security misconfiguration not immediately internet-exploitable;
-- missing replay/idempotency protection with bounded impact;
-- unresolved scanner result with strong evidence but incomplete reachability.
+## Scope and Attribution
 
-## Low
+- Project/full gates consider pre-existing issues in the reviewed current project.
+- Staged/commit/range gates consider issues introduced, worsened, or newly exposed by those changes, including a removed guard that exposes an unchanged sink. Use surrounding code from the target snapshot.
+- Explicit project mode also assesses the index changes separately when present. An unstaged fix cannot clear the staged-change gate. Overall status is the worse of the project and staged results.
+- Findings outside an explicitly narrow scope remain visible when incidentally discovered but do not silently change that scope's gate.
+- Baselines indicate prior review, not safety. Record accepted-risk documentation if supplied; do not create exceptions or suppress existing secrets yourself.
 
-Defense-in-depth, weak hardening, low-impact disclosure, or theoretical concern without a demonstrated attack path. Exclude from the blocking table unless exhaustive review was requested.
-
-## Informational
-
-Coverage notes, tool availability, non-vulnerable observations, and recommended future controls.
-
-## Confidence
-
-- **High:** source, missing/failed control, sink, exploit path, and impact are demonstrated.
-- **Medium:** strong evidence exists, but one material runtime/configuration fact is unknown.
-- **Low:** pattern-only, speculative, or framework behavior not validated. Do not report as a confirmed vulnerability.
-
-## Gate Mapping
-
-- Critical/High + High confidence: FAIL.
-- Critical/High + Medium confidence: WARN and Needs verification, unless a likely-valid secret is present; secrets fail immediately.
-- Medium + High/Medium confidence: WARN.
-- Low/Info only: PASS with observations.
+PASS is a scoped result, not certification or a guarantee of safe deployment.

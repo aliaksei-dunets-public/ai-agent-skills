@@ -2,12 +2,15 @@
 
 ## Should Trigger
 
-- Check my staged changes for security issues before I commit.
+- `$security-gate`
+- Проверь staged-изменения и связанный код перед коммитом.
+- Security check before I publish these changes.
+- `$security-gate initial` — проверь весь проект полностью.
+- Perform an initial security audit of this non-Git project folder.
+- Review this PR for auth, injection, dependency, and CI risks.
 - Audit commit `abc123` for vulnerabilities and leaked credentials.
-- Review this pull request for auth, injection, dependency, and CI risks.
-- Perform a full project security scan.
-- Check whether this new MCP server or agent hook is safe.
-- Scan Git history for exposed keys and tokens.
+- Check this new MCP server or agent hook for security issues.
+- Scan local Git history for exposed keys and tokens.
 
 ## Should Not Trigger
 
@@ -19,9 +22,11 @@
 
 ## Expected Behavior
 
-1. Defaults to staged scope for pre-commit requests.
-2. Does not execute project code or install tools.
-3. Uses deterministic scans before contextual reasoning.
-4. Redacts all suspected secrets.
-5. Validates source-to-sink exploitability and filters pattern-only noise.
-6. Returns PASS/WARN/FAIL with explicit coverage gaps.
+1. Bare invocation and pre-commit requests default to staged and related index context.
+2. Initial/full explicitly audits current contents of all components, even with no staged changes; no implicit history scan or suppression baseline.
+3. Empty staged scope is WARN, not PASS or an automatic full audit.
+4. Does not execute project code, install tools, change files, or configure hooks during review.
+5. Uses available trusted scanners plus contextual reasoning; errors and missing checks are visible.
+6. Redacts suspected secrets before output and never validates credentials against providers.
+7. Returns all confirmed findings and evidence-backed potential risks with fixes and verification steps.
+8. Returns PASS/WARN/FAIL consistent with scope, confidence, and coverage.

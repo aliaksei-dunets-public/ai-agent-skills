@@ -1,7 +1,10 @@
 # Secret prevention is the fast local gate. Keep broader SAST/SCA checks in CI.
 # Review and update pinned versions intentionally.
+# Optional setup example; invoking the skill does not install this hook.
+# Installing hooks can download/run tooling and is a separate requested action.
 repos:
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1
     hooks:
       - id: gitleaks
+        args: ["--redact=100"]

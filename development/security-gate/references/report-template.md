@@ -1,63 +1,59 @@
-# Security Gate Report
+# Security Check Report Contract
 
-## Gate
+Use the user's language. Keep an empty report short; expand actionable findings. Do not leave unresolved template placeholders in delivered reports.
 
-**PASS | WARN | FAIL**
+## Decision
 
-One-sentence reason.
+**Overall: PASS | WARN | FAIL** — one-sentence reason and what needs attention before commit/publication.
+
+For project mode, add **Project gate** and **Staged-change gate** (N/A when nothing is staged). Do not imply that a chat verdict installs or enforces a hook.
 
 ## Scope
 
-- Mode: staged | working-tree | commit | range/PR | full | history-secrets
-- Target: `<commit/range/paths>`
-- Reportable scope: changed lines/files or full repository
-- Context inspected outside scope: `<brief description or none>`
+- Project/root, mode, time, target revision(s), and reviewed snapshot(s).
+- Detected components/stacks and attribution basis (HEAD, parent, merge base, or unavailable).
+- Changed files reviewed and project areas inspected; identify sampling/exclusions.
+- For initial/full audits, include a compact per-component coverage summary covering each detected stack, its source, secrets, dependencies, and configuration. Show unreviewed components explicitly.
+- Staged versus current-file differences, untracked/ignored files, history/submodules/artifacts included or excluded.
 
 ## Coverage
 
-| Category | Method/tool | Result | Notes |
-|---|---|---|---|
-| Secrets | ... | Completed / Findings / Skipped | ... |
-| SAST | ... | ... | ... |
-| Dependencies | ... | ... | ... |
-| IaC/CI/containers | ... | ... | ... |
-| Contextual data flow | AI/manual | Completed | ... |
-
-## Blocking Findings
-
-| ID | Severity | Confidence | CWE / OWASP | Location | Finding | Exploit path and impact | Remediation |
-|---|---|---|---|---|---|---|---|
-
-Use redacted evidence only. Omit the table when empty and state: **No blocking findings detected within the defined scope and coverage.**
-
-### Detailed Finding Format
-
-For each blocking finding, expand below the table:
-
-- **ID / Title**
-- **Severity / Confidence**
-- **CWE / OWASP** (when applicable)
-- **Location:** exact file and line/range
-- **Evidence (redacted)**
-- **Source → Sink:** attacker-controlled source and dangerous sink
-- **Exploit path:** realistic prerequisites and steps
-- **Impact**
-- **Remediation:** specific, minimal fix addressing root cause
-- **Regression test:** recommended test to prevent reintroduction
-
-## Needs Verification
-
-| ID | Suspected severity | Location | Missing evidence | Verification step |
+| Category | Tool/version or manual method | Snapshot / extent | Status | Evidence / limitations |
 |---|---|---|---|---|
+| Secrets and sensitive data | ... | ... | ... | ... |
+| Source / SAST | ... | ... | ... | ... |
+| Dependencies / advisories | ... | ... | ... | ... |
+| Config / IaC / CI / publication | ... | ... | ... | ... |
+| Contextual security analysis | ... | ... | ... | ... |
 
-Omit when empty.
+Statuses: **Completed**, **Partial**, **Unavailable**, **Error**, **N/A**. “Completed” describes execution, not absence of findings. Give a reason for N/A and gaps. Include actual sanitized commands, exit status, rules/database freshness, and significant suppressions in brief notes where relevant. Never claim scans ran without results.
 
-## Remediation Order
+## Confirmed Vulnerabilities
 
-1. **Immediate:** credential rotation, active exploitation containment, or Critical fixes.
-2. **Before merge:** all FAIL findings and required regression tests.
-3. **Follow-up:** WARN findings, coverage gaps, hardening, and CI enforcement.
+Include **all severities**, not only blockers. Sort by severity and action priority. State “No confirmed vulnerabilities found within the checked scope” when empty.
 
-## Residual Risk
+| ID | Severity / confidence | Location + snapshot | Attribution | Issue / impact | Gate effect |
+|---|---|---|---|---|---|
 
-One concise statement explaining what the review did not prove or cover.
+For every actionable finding give:
+
+- **Evidence:** exact file/line and snapshot; sanitized excerpt or structural description. Use an artifact/config key or advisory ID when a source line is unavailable; never invent a line.
+- **Attack path and impact:** attacker input/identity, boundary, missing control, affected asset, and realistic prerequisites. For configuration/secrets use the equivalent exposure path.
+- **Fix:** smallest concrete root-cause correction.
+- **Verification:** safe regression test or static check; suggested tests are not tests already run.
+- **Reference:** CWE when confidently applicable; for dependencies include advisory URL/ID, resolved version, dependency path, affected range, runtime/build/dev use, reachability, verified fixed version or “not verified / no fix available”.
+
+## Potential Risks / Needs Verification
+
+| ID | Potential severity / confidence | Location + snapshot | Evidence and missing fact | Consequence | Fix or verification step |
+|---|---|---|---|---|---|
+
+Include concrete concerns by default, especially deployment assumptions, scanner-only candidates, and unverified reachability. Do not present them as confirmed vulnerabilities. State “None identified” when empty. Optional hardening observations belong in a short separate list and must be grounded in this project.
+
+## Fix Order and Remaining Gaps
+
+1. Urgent containment/rotation for likely real exposed credentials or active exposure.
+2. Blocking fixes before commit/publication, referencing finding IDs.
+3. Resolve material unknowns, Medium issues, and missing checks; then Low hardening work.
+
+List excluded surfaces and exact next steps for incomplete coverage. Explain in one sentence that results apply to the inspected snapshots and do not prove absence of vulnerabilities. Never call a project clean because tools failed or the diff was empty.

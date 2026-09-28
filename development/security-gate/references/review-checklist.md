@@ -2,6 +2,8 @@
 
 Load only the sections relevant to the detected stack and change scope.
 
+For initial/full audits, apply the relevant sections to every inventoried component, including existing code. For staged reviews, trace changes through related code in the index snapshot. Checklists guide investigation; their presence does not make each pattern a finding.
+
 ## Secrets and Sensitive Data
 
 Look for API keys, cloud credentials, exchange/bot tokens, OAuth client secrets, JWT signing material, passwords, database URLs, private keys, certificates with private material, webhook secrets, cookies, session tokens, encryption keys, recovery codes, and secrets embedded in URLs.
@@ -37,6 +39,8 @@ Review login, registration, password reset, email change, MFA, API keys, OAuth/O
 - accepting unsigned or incorrectly verified tokens;
 - session fixation or failure to rotate after privilege changes;
 - insecure cookie attributes;
+- CSRF on state-changing browser requests using ambient credentials; validate origin/token protections and actual cookie behavior;
+- CORS against actual sensitive resources and credential flows, rather than flagging every wildcard;
 - user enumeration with meaningful impact;
 - credentials or tokens in URLs/logs;
 - authentication failures that fail open.
@@ -121,6 +125,18 @@ Look for bypasses that static pattern tools often miss:
 - missing idempotency for payments and external side effects;
 - inconsistent validation between synchronous and background paths;
 - partial failure that commits an unsafe state.
+
+## Availability and Resource Limits
+
+Trace attacker-controlled sizes, counts, nesting, regex inputs, decompression ratios, expensive queries, pagination, retries, and upload/stream limits. Check whether rate limits and quotas apply to costly or privileged actions across identities. Report realistic resource exhaustion paths rather than treating every missing rate limiter as a vulnerability.
+
+## Native, Desktop, Mobile, and Local Tools
+
+For C/C++ and unsafe/FFI code, inspect bounds, lifetimes, integer overflow/truncation, format strings, parser assumptions, and privilege boundaries. For desktop/mobile tools, inspect IPC/deep links, embedded webviews, local storage, file permissions, credential storage, update signatures, and package integrity. For CLI/batch tools, trace untrusted arguments, environment variables, working directories, temporary files, and PATH/plugin lookup. A local attack needs explicit attacker capabilities; do not assume every tool is remotely exposed.
+
+## Publication and Packaging
+
+Inspect Docker contexts and `.dockerignore`, npm `files`/ignore rules, Python source distributions, release archives, frontend source maps/bundles, mobile assets, and CI artifact upload paths. Git ignore rules do not define these boundaries. Check inclusion of environment files, credentials, internal debug material, private datasets, and build-time secrets. Assess available artifacts statically without building or publishing them; state when actual artifact contents were not verified.
 
 ## Agent, Skill, and MCP Security
 

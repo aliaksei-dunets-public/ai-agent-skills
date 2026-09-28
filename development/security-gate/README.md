@@ -1,22 +1,50 @@
-# Security Gate Agent Skill
+# Security Gate
 
-A portable Agent Skill for pre-commit, commit/range, pull-request, full-repository, and Git-history security reviews.
+Универсальный навык проверки безопасности проекта. Подстраивается под стек и доступные инструменты; выдаёт отчёт на языке запроса. Обычный запуск проверяет **staged-изменения и связанный с ними код**. Для первичного аудита всего проекта есть **initial/full**.
 
-## Contents
+## Запуск
 
-- `SKILL.md` — core workflow and behavior.
-- `references/review-checklist.md` — detailed vulnerability categories.
-- `references/tooling.md` — safe scanner selection and commands.
-- `references/severity.md` — severity, confidence, and gate policy.
-- `references/report-template.md` — standardized output.
-- `references/git-commands.md` — Git commands by mode.
-- `references/sources.md` — authoritative maintenance references.
-- `templates/pre-commit-config.yaml` — fast local secret gate using Gitleaks.
-- `templates/github-security-controls.md` — CI enforcement checklist.
-- `evals/trigger-cases.md` — positive and negative routing tests.
-- `evals/scenarios.md` — functional evaluation scenarios with planted vulnerabilities.
-- `evals/criteria.md` — scoring dimensions and pass thresholds.
+Вызовите навык в чате агента, которому доступна папка `security-gate`:
 
-## Recommended Use
+```text
+$security-gate
+```
 
-Install the folder in the skills directory supported by the target agent. Invoke it before commit/merge and pair it with mandatory CI controls. The skill intentionally does not auto-install tools, execute project code, or auto-fix findings.
+Проверка версии, которая попадёт в коммит. Учитывает частичное добавление файла через `git add -p`: исправление только в рабочем файле не скрывает уязвимость в staged. Если ничего не добавлено, навык сообщает об этом и не подменяет проверку аудитом всего проекта.
+
+```text
+$security-gate initial — проверь весь проект полностью перед первой публикацией
+```
+
+Первичный аудит текущих файлов всех компонентов: код, секреты, прямые и транзитивные зависимости, конфигурация, CI/CD, инфраструктура и правила упаковки. Включает существовавшие ранее проблемы и не требует staged-изменений. `full` — синоним `initial`. История Git проверяется отдельным режимом; недоступные файлы и инструменты отражаются в покрытии.
+
+Дополнительные запросы:
+
+```text
+$security-gate project — проверь весь проект и отдельно будущий коммит
+$security-gate working-tree — проверь все локальные изменения
+$security-gate — проверь коммит <SHA>
+$security-gate — проверь изменения между <base> и <target>
+$security-gate history-secrets — проверь историю Git на утечки секретов
+$security-gate initial — сохрани отчёт в SECURITY-REPORT.md
+```
+
+Это примеры запросов агенту, а не команды shell.
+
+## Результат
+
+- `FAIL`: обнаружены обоснованные блокирующие проблемы.
+- `WARN`: есть значимые риски, проблемы средней тяжести или неполное покрытие.
+- `PASS`: в проверенной области не выявлено блокирующих проблем и предупреждений; это не гарантия отсутствия уязвимостей.
+
+Отчёт содержит подтверждённые уязвимости всех уровней, отдельный список возможных рисков, файл/строку и версию, последствия, доказательства, исправление и способ его проверки. Для initial/full дополнительно указывается покрытие каждого компонента проекта. Секреты заменяются на `[REDACTED]`.
+
+Навык работает с доступными сканерами и ручным анализом. Отсутствие сканера, свежей базы уязвимостей или достоверной версии зависимостей не превращается в успешную проверку. Код проекта не запускается, пакеты не устанавливаются, исправления и коммиты автоматически не выполняются. Отчёт возвращается в чат; файл создаётся по запросу.
+
+## Состав
+
+- `SKILL.md` — основной сценарий и выбор режима.
+- `references/` — работа с Git, инструменты, категории проверок, оценка риска, формат отчёта и первичные источники.
+- `agents/openai.yaml` — описание навыка и пример вызова в интерфейсе Codex.
+- `evals/` — сценарии проверки поведения, критерии и примеры активации.
+- `templates/` — необязательные примеры настройки hook и CI. Они не устанавливаются при вызове навыка; сам навык не блокирует команду `git commit` технически.
