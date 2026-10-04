@@ -33,6 +33,11 @@ Select the smallest mode sufficient for the request:
 Do not invent findings to reach a target count. If no material issue is found,
 state that conclusion and cite the supporting evidence.
 
+An audit, review, or comparison request is read-only unless scoped fixes are also
+requested. Use `optimize` for authorized edits; preserve existing work and record
+the baseline before changing the target. Neither mode authorizes installation,
+live external actions, or execution of the audited domain workflow.
+
 ## Core Principles
 
 1. **Outcome first** — identify intended outcomes, success criteria, boundaries,
@@ -91,6 +96,9 @@ trigger -> task classification -> context selection -> execution/delegation
 ```
 
 Record who owns planning, actions, validation, consolidation, and completion.
+
+Separate prescribed behavior, code/schema-enforced behavior, and observed
+execution. A prompt instruction is not evidence of technical enforcement.
 
 ### 4. Select audit references
 
@@ -156,6 +164,11 @@ When optimizing, keep a baseline and representative eval set. Apply one
 independent change at a time, rerun the same cases under comparable conditions,
 and retain only changes that improve the chosen objective without unacceptable
 regression.
+
+If runtime evaluation is unavailable, perform scoped static checks and scenario
+review; label runtime impact unmeasured. Do not claim measured improvement from
+text length or a walkthrough. Revert or leave disabled a candidate with an
+observed quality regression.
 
 ### 9. Stop
 
@@ -256,6 +269,12 @@ In `optimize` mode:
 6. separate prompt controls from runtime/application controls;
 7. add or update validation fixtures when practical;
 8. report only material findings, applied changes, unresolved questions, and measured metrics; include retained behavior or remaining risks only when material.
+
+Keep summaries derived: retain request/specification sources, required criteria,
+evidence pointers, verification, blockers, and the next step. Revalidate stale summaries
+after source changes rather than treating them as a new authority. Evaluate
+delegation for net benefit and existing authorization; one owner retains
+integration and acceptance responsibility.
 
 Provide an implementation plan before editing unless the user requests direct
 modification.

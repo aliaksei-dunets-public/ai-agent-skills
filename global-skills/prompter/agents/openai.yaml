@@ -1,4 +1,4 @@
 interface:
   display_name: "Prompt Architect"
   short_description: "Create, audit, and refine prompts"
-  default_prompt: "Use $prompt-architect to turn this request into a production-ready prompt."
+  default_prompt: "Use $prompter to turn this request into a clear, ready-to-use prompt."

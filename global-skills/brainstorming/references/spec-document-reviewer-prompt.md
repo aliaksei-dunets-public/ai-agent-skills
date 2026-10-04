@@ -1,10 +1,12 @@
 # Spec Document Reviewer Prompt Template
 
-Use this template when dispatching a spec document reviewer subagent.
+Use this template when a separate spec review is authorized and useful. Otherwise
+apply the checks as self-review. Give the reviewer read-only scope and actual
+requirements and sources, without the author's persuasive narrative.
 
 **Purpose:** Verify the spec is complete, consistent, and ready for implementation planning.
 
-**Dispatch after:** Spec document is written to `docs/design/`
+**Review after:** The spec is reviewable in the project's chosen location.
 
 ```
 Subagent (general-purpose):
@@ -13,6 +15,9 @@ Subagent (general-purpose):
     You are a spec document reviewer. Verify this spec is complete and ready for planning.
 
     **Spec to review:** [SPEC_FILE_PATH]
+    **Requirements and project constraints:** [SOURCE_PATHS_OR_REQUEST]
+    Do not edit files or approve on behalf of the user. Your result is a
+    technical assessment, not execution or user acceptance.
 
     ## What to Check
 
@@ -31,18 +36,18 @@ Subagent (general-purpose):
     interpreted two different ways — those are issues. Minor wording improvements,
     stylistic preferences, and "sections less detailed than others" are not.
 
-    Approve unless there are serious gaps that would lead to a flawed plan.
+    Mark ready for planning unless serious gaps would lead to a flawed plan.
 
     ## Output Format
 
     ## Spec Review
 
-    **Status:** Approved | Issues Found
+    **Status:** Ready for planning | Issues Found
 
     **Issues (if any):**
     - [Section X]: [specific issue] - [why it matters for planning]
 
-    **Recommendations (advisory, do not block approval):**
+    **Recommendations (advisory, do not block planning):**
     - [suggestions for improvement]
 ```
 

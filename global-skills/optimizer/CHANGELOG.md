@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.7.0 — 2026-10-04
+
+- Clarified portable optimization boundaries: read-only
+  auditing, baseline preservation, and scoped editing authorization.
+- Distinguished prescribed instructions, technical enforcement, and observed
+  execution.
+- Added an explicit static-only validation fallback without runtime savings
+  claims, and rollback guidance for observed quality regressions.
+- Preserved requirements sources, criteria, evidence, freshness, and integration
+  ownership in compact handoffs.
+
 ## 1.6.0 — 2026-07-15
 
 - Added automatic user-facing report language selection.

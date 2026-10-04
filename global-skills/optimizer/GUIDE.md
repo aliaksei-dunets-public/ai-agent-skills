@@ -32,6 +32,12 @@ Provide any available:
 The skill can still perform a static audit without runtime evidence, but it must
 label inferred behavior and lower confidence.
 
+Audit and comparison requests leave target artifacts unchanged unless fixes are
+also requested. Optimization records a baseline and preserves existing work.
+Static checks and scenario review can validate instruction consistency, but do
+not establish runtime savings. Separate prescribed, enforced, and observed
+behavior when presenting evidence.
+
 ## Modes
 
 - `quick`: compact report with up to three material findings.

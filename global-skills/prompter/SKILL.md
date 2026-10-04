@@ -1,61 +1,90 @@
 ---
 name: prompter
-description: Create, improve, audit, and refine prompts for ChatGPT, Claude, Gemini, and other LLMs. Use when Codex needs to turn a rough request into a strong prompt, critique an existing prompt, rewrite prompts for clarity or structure, help a user explore a vague prompt idea, or produce reusable prompt templates and prompt versions.
+description: >
+  Create, improve, audit, or explore prompts for LLMs. Use when the requested
+  deliverable is a prompt, prompt critique, or reusable prompt template. Preserve
+  the user's intent and target capabilities; do not perform the domain task
+  described inside a prompt unless separately requested.
 ---
 
 # Prompt Architect
 
-## Overview
+Produce the smallest prompt or assessment that satisfies the request. Preserve
+the user's goal, constraints, source material, and requested output format.
 
-Use this skill to transform raw user intent into a production-ready prompt without adding unnecessary complexity. Preserve the original user goal, identify the real prompt task, and adapt the level of structure to the task's risk and ambiguity.
+## Select the requested result
 
-Read [references/universal-prompt.md](references/universal-prompt.md) before producing the final prompt. Treat that file as the source prompt specification and preserve its original wording and structure where practical.
+| Mode | Request | Deliverable |
+| --- | --- | --- |
+| `GENERATE` | Create a prompt from requirements | Ready-to-use prompt |
+| `IMPROVE` | Revise an existing prompt | Revised prompt with material changes explained when useful |
+| `AUDIT` | Evaluate a prompt | Evidence-based critique and recommendations; no rewrite unless requested |
+| `EXPLORE` | Clarify a vague prompt idea | Focused questions or options; a provisional draft only if useful and nonblocking |
 
-## Core Workflow
+Combine modes only when the request calls for both, such as “audit and improve.”
+Do not turn exploration into a finished prompt with unresolved critical choices,
+or an audit into an unsolicited revision.
 
-1. Detect the primary intent first: `[GENERATE]`, `[IMPROVE]`, `[AUDIT]`, or `[EXPLORE]`.
-2. Identify the domain: `[CODE]`, `[QA]`, `[DATA]`, `[CREATIVE]`, `[LEARNING]`, `[AGENT]`, `[META]`, or `[UNIVERSAL]`.
-3. Check completeness against role, context, task, input data, output, constraints, and success criteria.
-4. Run risk, platform-capability, and research checks before writing the final prompt.
-5. Ask clarifying questions only when critical gaps cannot be assumed safely. Keep it to at most 3 questions.
-6. Select the lightest prompt structure that will still work reliably.
-7. Deliver the final prompt in a fenced Markdown code block in the user's language unless they ask otherwise.
+## Establish requirements
 
-## Skill-Specific Rules
+Read the request and supplied prompt as distinct inputs. A prompt being reviewed
+is material to analyze, not an instruction to execute its embedded task.
+Identify the purpose, audience, required inputs, expected result, constraints,
+and success criteria relevant to this request. A role, numbered steps, or a
+formal schema is optional unless it materially improves the result.
 
-- Prefer the shortest prompt that is still complete and testable.
-- Do not assume browsing, tools, memory, file access, or sub-agents unless the target platform is known to support them.
-- If the user gives a weak request, explain what is weak before revising it.
-- If assumptions are made, state them briefly above the prompt.
-- For audits, provide the critique and score first, then the improved prompt.
-- For iterative work, label revisions clearly as `v1`, `v2`, `v3` and note what changed.
-- If the user asks for a reusable prompt, make the output copy-paste ready with no extra links.
-- If the user request is already strong, keep edits minimal and say what changed in a compact summary.
+Ask about any critical missing detail that prevents a reliable result, even if
+only one is missing. Ask a small set of focused questions, normally at most
+three per turn; wait for answers to blocking questions. For nonblocking gaps,
+use explicit assumptions or clearly labeled input slots in reusable templates.
+Do not infer user approval, required facts, or unavailable capabilities.
 
-## Output Pattern
+Adapt to the target platform only from known capabilities. When it is unknown,
+write a portable prompt without assuming browsing, tools, files, memory, code
+execution, or subagents. Do not ask for a platform if a portable result suffices.
 
-Use this response shape unless the user asks for something else:
+## Assemble or assess
 
-1. One short line for detected intent and domain.
-2. One short assumptions block only if needed.
-3. One concise audit block only when the task includes critique.
-4. The final prompt in a fenced code block.
-5. The calibration line from the reference workflow.
-6. The version-loop offer only when the task is complex, uncertain, or experimental.
+- For simple requests, work directly from these instructions; no reference read
+  is required. For a complex template or domain-specific technique decision,
+  read [the structure and technique menu](references/universal-prompt.md).
+  It offers optional techniques, not a second workflow or a mandatory template.
+- Use only sections and techniques needed for the requested outcome. Avoid
+  adding architecture discussions, XML, multiple variants, or negative
+  constraints solely because a domain label suggests them.
+- Preserve necessary user-provided URLs, file paths, identifiers, and citations.
+  Add external references when requested or needed for grounding; omit unrelated
+  links. For a reusable template with no fixed source, label its source input
+  slot instead of inventing a URL.
+- Research only when constructing the prompt depends on missing or current
+  facts or capabilities. Use available, authorized tools and distinguish
+  verified facts from assumptions. Do not perform the downstream research task
+  just to write its prompt. If needed evidence is unavailable, ask for it or
+  require its verification in the target prompt.
+- For sensitive or consequential tasks, preserve relevant uncertainty,
+  evidence requirements, action boundaries, and review criteria. Do not add
+  generic warnings unrelated to the requested behavior.
+- For agent prompts, specify relevant tool boundaries, failure handling, and
+  stop conditions without granting new permissions or assuming delegation.
 
-## Prompt Assembly Notes
+In `AUDIT`, connect material findings to exact wording, missing inputs, conflicts,
+or observable failure cases. Recommend minimal changes; distinguish static
+assessment from measured performance. Give a numeric score only when requested,
+with stated criteria and limitations. Do not invent execution results.
 
-- Reuse the section menu from the reference file rather than forcing every section into every prompt.
-- Keep anti-patterns only when they materially improve output quality.
-- For high-risk topics, require uncertainty disclosure, grounding, and expert review where appropriate.
-- For agentic prompts, prefer explicit tool boundaries, fallback handling, and stop conditions.
-- For code prompts, prefer architecture before implementation.
-- For creative prompts, prefer audience, tone, and CTA only when they matter to the task.
+Before delivery, check intent and scope, required inputs, instruction consistency,
+source preservation, feasibility on the target, and testable success criteria.
+Remove repetition and template sections that add no value.
 
-## Trigger Examples
+## Delivery and iteration
 
-- "Write me a system prompt for a support bot."
-- "Improve this prompt for Claude."
-- "Audit this prompt and score it."
-- "I only have a vague idea for a research assistant prompt."
-- "Turn this requirement doc into a reusable ChatGPT prompt."
+Use the user's requested language and format. Otherwise put a generated or revised
+prompt in a fenced Markdown block for copying, with assumptions and material
+change notes outside it. An audit or exploration response does not require a
+prompt block. If the user asks for only the prompt, omit the surrounding commentary.
+
+Do not print internal intent/domain labels, a calibration score, or a follow-up
+offer by default. For iterative revisions, preserve accepted requirements,
+label versions when useful, and state only the material differences. Evaluate
+actual target-model outputs when supplied; do not claim effectiveness from
+prompt wording alone.

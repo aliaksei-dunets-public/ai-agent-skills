@@ -1,98 +1,116 @@
 ---
 name: brainstorming
-description: "Turn an idea or approved requirements into a clear design, specification, or agent-ready implementation plan. Use interactively when the user asks to think, brainstorm, design, or invent; use planning mode when an agent needs a concrete implementation plan before code changes."
+description: >
+  Clarify an idea, task scope, or material uncertainty and produce a design,
+  requirements handoff, or implementation plan. Use for requested brainstorming,
+  design exploration, or planning, and when unresolved requirements would change
+  the work. Do not force a design ceremony on clear, already authorized work.
 ---
 
-# Brainstorming and Implementation Planning
+# Brainstorming and Task Preparation
 
-Choose one mode before acting:
+Turn the user's intent into a proportionate, reviewable result. Keep requirements,
+design, implementation planning, and execution distinct. This skill prepares work
+and returns a clear result to the user or calling agent.
 
-- **Interactive brainstorming** — the user asks to think, brainstorm, design,
-  or invent. Preserve the hard-gate and collaborative dialogue below.
-- **Planning mode** — an agent asks for an implementation plan, or an approved
-  spec/requirements document is available. Optimize for execution by agents:
-  inspect the repository, resolve requirements from existing evidence, and
-  produce a concrete plan without unnecessary conversational turns.
+## Select the result
 
-In both modes, do not write code, scaffold a project, or perform implementation
-work until the design or requirements have been approved or are explicitly
-provided as approved input.
+Choose from the request and current context, not from the presence of a tool:
 
-## Interactive brainstorming
+| Mode | Use when | Result |
+| --- | --- | --- |
+| `direct_response` | The user wants an explanation, answer, or comparison | Answer in the conversation; no task or file unless needed |
+| `managed_work` | Work is assigned but its scope or acceptance needs clarification | Compact requirements handoff for the next step |
+| `design_only` | The user asks to explore ideas or propose a design without execution | Alternatives and a recommended design, with its decision status |
+| `planning` | An implementation plan is explicitly requested or required by the active workflow | Actionable plan based on requirements and repository evidence |
 
-Use this mode when the user explicitly wants ideation or design exploration.
+An execution request with clear requirements already authorizes routine choices
+within that scope. Complete only the preparation it needs, then return control to
+the calling workflow. Do not require another approval merely because this skill
+was loaded. A design-only or planning-only request does not authorize execution.
 
-1. Explore the project context first: files, docs, relevant history, and
-   existing patterns.
-2. Ask clarifying questions one at a time. Focus on purpose, constraints,
-   success criteria, scope, and failure cases. Prefer choices when they make
-   the decision easier.
-3. Propose 2–3 viable approaches with trade-offs and a recommendation.
-4. Present the design in reviewable sections. Cover architecture, components,
-   data flow, error handling, and testing at a level proportional to scope.
-5. Get user approval for the proposed design. If a section is rejected, revise
-   it before continuing; do not implement or plan prematurely.
-6. After approval, write the validated design to
-   `docs/design/YYYY-MM-DD-<topic>-design.md`.
-7. Self-review the written spec and fix issues in place:
-   - no `TBD`, `TODO`, placeholders, or vague requirements;
-   - no contradictions between requirements, architecture, and behavior;
-   - scope fits one implementation plan;
-   - ambiguous choices are made explicit.
-   If a separate spec reviewer is available, use
-   `references/spec-document-reviewer-prompt.md` for that review.
-8. Ask the user to review the written spec. Incorporate changes and repeat the
-   self-review; explicit approval of the written spec is the final gate.
-9. Once approved, switch to Planning mode and read
-   `references/writing-plans.md`.
+## Establish the task
 
-Do not require a design conversation for a task that is already accompanied by
-an approved spec or explicit implementation requirements; use Planning mode.
+1. Read the request, applicable project instructions, and relevant context.
+   Search before opening large files. If requirements or a specification are
+   supplied, preserve their source and check against the latest user direction.
+2. Identify the goal, expected deliverable, scope, exclusions, constraints,
+   existing decisions, and observable acceptance criteria. Separate verified
+   facts, accepted decisions, proposals, and assumptions; cite their sources when
+   the distinction affects subsequent work.
+3. Ask only about missing decisions that materially affect scope, external
+   actions, compatibility, or acceptance. Prefer one concise question with
+   choices when useful. Continue independent work while waiting.
+4. Wait for a real answer when a decision or authorization is required. Elapsed
+   time, silence, reviewer feedback, and an assumed preference are not approval.
+   For a nonblocking uncertainty, state a reversible assumption and its impact.
+5. Compare approaches only where trade-offs matter. Explain the recommendation;
+   do not invent two alternatives for an obvious correction.
 
-## Planning mode
+Stop discovery when the requested result can be produced with explicit scope and
+testable criteria. Keep unresolved blocking decisions visible rather than
+presenting a proposal as accepted.
 
-Use this mode when the goal is to prepare an implementation plan for an agent.
-Do not ask routine discovery questions if the repository, task, or approved
-spec already answers them. Ask only when a missing decision would materially
-change scope, behavior, or safety.
+## Design exploration
 
-1. Read the approved spec or requirements. If none exists, use the user's
-   explicit planning request as requirements input; derive a compact design
-   from it and repository evidence, recording material assumptions.
-2. Inspect the current project before defining work: relevant files, tests,
-   interfaces, configuration, docs, and established patterns.
-3. Check scope. Split independent subsystems into separate plans or state the
-   decomposition needed before implementation.
-4. Read `references/writing-plans.md` and follow its plan header, file map,
-   task structure, step granularity, exact commands, and self-review rules.
-   Treat it as the local planning reference, not as a separate skill to invoke.
-5. Create the plan at
-   `docs/plans/YYYY-MM-DD-<feature-name>.md`, unless the user gave a
-   different location.
-6. Make every task independently actionable and testable. Include exact file
-   paths, interfaces, implementation details, tests, expected results, and
-   dependencies on earlier tasks. Do not use placeholders or vague steps.
-7. Self-review the finished plan for spec coverage, scope, placeholders, and
-   cross-task type/interface consistency.
-8. If the project or active environment provides a `task-manager` skill, invoke
-   its create operation to create a new task for the plan you just created.
-   Pass the plan path as the task's `--plan` value and the plan goal as its
-   `--title` value; let `task-manager` allocate the task ID and filename. Do
-   not duplicate the plan contents in the task. If `task-manager` is
-   unavailable, continue without installing or inventing one and report that
-   task creation was skipped.
-9. Return the plan path, material assumptions, validation commands, task-manager
-   result, and any blocking decisions. Do not implement the plan in this mode.
+In `design_only`, present a design at a depth proportional to the problem. Cover
+the behavior and relevant boundaries, interfaces, data flow, failure handling,
+and verification. Short tasks can fit in one response; do not impose section
+lengths or repeated approvals.
 
-## Shared constraints
+If a material new design decision is needed for assigned implementation, make it
+reviewable before asking for that decision. Reuse existing approval and accepted
+requirements; do not ask again for approval of their written copy. A reviewer's
+technical assessment does not substitute for a user decision.
 
-- Keep units focused and communicate through explicit interfaces.
-- Follow existing repository patterns unless the approved design intentionally
-  changes them.
-- Apply YAGNI: include only behavior required by the request and its constraints.
-- Preserve security, correctness, compatibility, and failure reporting while
-  making the design or plan shorter.
-- Separate user-facing discussion from agent-facing plan detail: interactive
-  responses should be understandable; plans should be precise and executable.
-- The only bundled planning dependencies are `references/writing-plans.md` and
-  `references/plan-document-reviewer-prompt.md`.
+Save a design only when requested, required by the project, or needed as a durable
+handoff. Use the project's existing location and language. If a file is needed
+and no convention exists, use `docs/design/YYYY-MM-DD-<topic>-design.md`. Mark
+proposal, accepted decision, and remaining questions accurately. Self-review for
+contradictions, scope creep, and ambiguous acceptance. For a separately authorized
+review, use [the spec review reference](references/spec-document-reviewer-prompt.md).
+
+## Implementation planning
+
+In `planning`, read [the planning reference](references/writing-plans.md).
+Build from the supplied requirements or explicit planning request, inspecting
+actual files, interfaces, tests, and project conventions before assigning steps.
+Do not describe unverified APIs or future capabilities as implemented facts.
+
+Make each task actionable: identify files, dependencies, interfaces, observable
+behavior, and appropriate checks with commands and expected outcomes. Record
+unresolved assumptions instead of manufacturing exact code or commands. Keep
+architecture rationale in the design and execution steps in the plan, linked
+without copying entire documents.
+
+Use the project-defined plan location and format first. Reuse an existing plan
+instead of creating a competing copy. With no project convention, a needed
+standalone plan may use `docs/plans/YYYY-MM-DD-<topic>.md`.
+
+Self-review requirements coverage, dependencies, interface consistency, and
+checks. Use [the plan review reference](references/plan-document-reviewer-prompt.md)
+only for a separately authorized review. Return the plan and blocking decisions;
+execution continues only within the user's request or active workflow.
+
+## Handoff and ownership
+
+For `managed_work`, return only what the next step needs, in the user's language:
+
+- goal and deliverable;
+- request/specification source and relevant context with source pointers;
+- requirements, accepted decisions, scope, and constraints;
+- observable acceptance criteria;
+- material assumptions, unresolved decisions, and the next required step.
+
+This handoff is requirements input, not an implementation plan or completion
+report. When prior state is available, send the changed facts and decisions with
+enough context to remain understandable; keep full evidence accessible at source.
+
+- Do not create tracking records or other artifacts just to brainstorm.
+- Do not present successful preparation as implementation, validation, or user
+  acceptance. State which decisions are accepted and which remain proposals.
+- Follow project rules for documents, language, and machine-readable values;
+  do not impose another project's paths, tools, storage, or process.
+- Do not automatically install tools, create a worktree, delegate, commit, or
+  publish as part of preparation. Use those actions only within existing scope
+  and authorization.
