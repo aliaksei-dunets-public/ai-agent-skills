@@ -1,187 +1,50 @@
-# Python Code Review Report
+# Python Review Report Contract
 
-Use the shortest form that preserves evidence. Do not add empty sections.
+Use the user's language and the shortest form that preserves material evidence.
+Omit empty sections. A focused review does not require an executive summary,
+architecture essay, strengths list, or completed checklist in its final answer.
 
-## Verdict
+## Default result
 
-**Decision:** `APPROVE | APPROVE WITH FOLLOW-UPS | REQUEST CHANGES | BLOCK | INCONCLUSIVE`
+1. **Findings:** order by severity using the policy in [SKILL.md](../SKILL.md).
+   For each item include location/snapshot, triggering scenario, evidence and
+   causal impact, minimal correction or acceptance condition, and confidence.
+   Consolidate systemic issues with representative locations. Distinguish
+   confirmed findings, concrete unresolved risks, and optional suggestions.
+   State briefly when no material issue is found.
+2. **Scope and verification:** identify reviewed target and relevant context,
+   refs/snapshot when applicable, coverage limits, checks actually run, their
+   observed results, and skipped required checks. State what static tracing or
+   green tests cannot establish.
+3. **Verdict, when requested or expected for merge:** use the entry point's
+   verdict policy. Explain any blocker or insufficient evidence. A review verdict
+   does not merge code, complete implementation, or express user approval.
 
-**Rationale:** One or two sentences describing the highest-impact technical
-reason for the decision.
+A changed-code finding can be as compact as:
 
-## Scope and Confidence
+```text
+[Severity] Title — path:line (snapshot)
+Trigger and evidence; causal impact.
+Correction or acceptance condition. Confidence: high / medium / low.
+```
 
-- **Review mode:** `CHANGE_REVIEW | COMPONENT_REVIEW | PROJECT_AUDIT`
-- **Target scope:**
-- **Context scope:**
-- **System horizon:**
-- **Base / head:**
-- **Requirements / plan:**
-- **Exclusions:**
-- **Repository instructions consulted:**
-- **Coverage:** inspected deeply / sampled / not inspected
-- **Overall confidence:** `high | medium | low`
+Do not invent line numbers where a symbol, configuration key, or architectural
+boundary is the available evidence. Keep secrets and private data redacted.
 
-## Executive Summary
+## Expand only when useful
 
-Summarize what the software or change does, whether the design is coherent, the
-principal strengths, the highest-impact risks, and whether known requirements
-are satisfied. Do not reduce this section to a count of findings.
+For a requested detailed report, project audit, or important cross-boundary risk,
+add only necessary, non-repeating material:
 
-## System Understanding
+- system model: affected workflow, boundaries, state/invariants, failure behavior;
+- architecture: demonstrated systemic risks or strengths with evidence;
+- scenario traces: normal/failure paths and established or unknown outcomes;
+- project coverage: inspected, sampled, and uninspected components;
+- test assessment: contracts protected, boundary fidelity, and material gaps;
+- verification table: command, scope/snapshot, result, relevance, limitations;
+- independent review: actual mechanism, new evidence, rejected findings, and limits;
+- required actions and residual risks.
 
-### Purpose and Primary Workflows
-
-Describe the relevant system behavior in concise technical terms.
-
-### Components and Boundaries
-
-Describe the main components, dependency direction, external boundaries, and
-where responsibilities are implemented.
-
-### State, Resources, and Invariants
-
-Describe important state ownership, lifecycle, irreversible side effects,
-transactions, resource ownership, and correctness invariants.
-
-### Failure and Recovery Model
-
-Describe how expected failures, retries, partial success, cancellation,
-cleanup, restart, and recovery behave.
-
-## Change in System Context
-
-For change reviews, explain:
-
-- what changed semantically, not only textually;
-- affected callers, contracts, data, configuration, persistence, and jobs;
-- compatibility and deployment implications;
-- why the actual blast radius is limited or broader than the diff.
-
-For project audits, replace this section with the audit coverage strategy and
-representative areas selected.
-
-## Architectural Assessment
-
-Assess:
-
-- responsibility placement and cohesion;
-- dependency direction and coupling;
-- abstraction fitness and duplicated knowledge;
-- state and lifecycle ownership;
-- changeability and likely propagation of future changes;
-- testability, diagnosability, and operational support.
-
-Include both strengths and risks. Avoid generic architecture commentary.
-
-## Scenarios Traced
-
-| Scenario | Path or components | Observed outcome | Risk or conclusion |
-|---|---|---|---|
-| | | | |
-
-Include at least one normal and one credible failure scenario for non-trivial
-reviews.
-
-## Findings
-
-### Systemic Findings
-
-Problems that arise from architecture, repeated patterns, shared abstractions,
-or cross-cutting behavior.
-
-#### SYS-1 — Concise title
-
-- **Severity:** `Critical | Blocking | Important | Minor`
-- **Boundary / representative locations:**
-- **Evidence:**
-- **Triggering scenario:**
-- **Causal path:**
-- **Impact:**
-- **Recommended correction / acceptance criterion:**
-- **Confidence:** `high | medium | low`
-
-Write `None` when no systemic finding is confirmed.
-
-### Localized Findings
-
-#### LOC-1 — Concise title
-
-- **Severity:** `Critical | Blocking | Important | Minor`
-- **Location:** `path/to/file.py:line`
-- **Evidence:**
-- **Triggering scenario:**
-- **Causal path:**
-- **Impact:**
-- **Recommended correction / acceptance criterion:**
-- **Confidence:** `high | medium | low`
-
-Write `None` when no localized finding is confirmed.
-
-### Suggestions
-
-Optional alternatives without a demonstrated defect. Keep them separate from
-required work.
-
-## Requirements and Contract Alignment
-
-- Requirements satisfied:
-- Missing or partially implemented requirements:
-- Intentional deviations:
-- Backward-compatibility impact:
-- API/schema/migration/deployment implications:
-
-## Verification Evidence
-
-| Command or check | Scope | Result | What it proves | Limitations |
-|---|---|---|---|---|
-| | | | | |
-
-State explicitly when checks were not run.
-
-## Test Architecture and Confidence
-
-- Contracts actually protected:
-- Normal and failure-path coverage:
-- Boundary and integration fidelity:
-- Mock realism:
-- Isolation and determinism:
-- Structural test-suite risks:
-- Missing high-value tests:
-
-## Coverage Backstop
-
-This section confirms coverage; it must not replace the system analysis above.
-
-| Dimension | Assessment | Key evidence or residual risk |
-|---|---|---|
-| Behavior and correctness | | |
-| Clarity and local design | | |
-| Architecture and changeability | | |
-| Security and data protection | | |
-| Reliability, performance, and operations | | |
-| Python-specific behavior | | |
-
-## Independent Review
-
-- **Mechanism:** fresh subagent, independent model/session, or isolated fallback
-- **Independent verdict:**
-- **Systemic insights discovered independently:**
-- **Additional localized findings:**
-- **Primary findings rejected or changed after challenge:**
-- **Limitation:** disclose when no genuinely independent execution was available.
-
-## Strengths
-
-List specific qualities that materially improve correctness, simplicity,
-changeability, testability, security, or operational reliability.
-
-## Residual Risks and Unknowns
-
-Document unavailable requirements, unexecuted environments, unknown external
-contracts, sampled areas, assumptions, and operational risks that remain.
-
-## Required Actions
-
-1. Only actions required by Critical or Blocking findings.
-2. Keep Important follow-ups and optional improvements separate.
+Do not reproduce the entire internal investigation. Independent-review status is
+required when a separate review was used or required; disclose self-review and
+unmet acceptance gates without presenting it as independent execution.

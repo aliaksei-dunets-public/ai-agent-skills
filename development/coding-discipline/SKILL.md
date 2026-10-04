@@ -1,80 +1,72 @@
 ---
 name: coding-discipline
-description: Apply caution-first coding guidelines when creating or modifying source code, tests, scripts, configuration, migrations, or refactoring. Do not use for documentation-only, analysis-only, audit-only, read-only diagnostics, or runtime inspection tasks unless code changes are included.
+description: >
+  Keep implementation focused, proportionate, and verifiable when creating or
+  modifying code, tests, scripts, configuration, migrations, or refactoring.
+  Do not use for documentation-only work, audits, or read-only diagnostics
+  unless implementation changes are included.
 ---
 
 # Coding Discipline
 
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with
-project-specific instructions as needed.
+Make the smallest coherent change that satisfies the user's goal and the
+project's correctness, security, and compatibility requirements. These are
+implementation guidelines, not an additional approval or review workflow.
 
-Tradeoff: these guidelines bias toward caution over speed. For trivial tasks,
-use judgment.
+## Resolve material uncertainty
 
-## 1. Think Before Coding
+Read the request and relevant project context before editing. Reuse accepted
+requirements and decisions. Ask only when a missing decision materially changes
+scope, behavior, compatibility, external actions, or acceptance.
 
-Don't assume. Don't hide confusion. Surface tradeoffs.
+For a low-risk, reversible choice, select a reasonable approach and state the
+assumption if it affects the result. Compare alternatives only when their
+trade-offs matter; do not require a question or design ceremony for clear work.
 
-Before implementing:
+## Keep the solution proportionate
 
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them; don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If material uncertainty remains, name what is confusing and ask. If the risk
-  is low, make a safe assumption and state it instead of blocking progress.
+- Implement required behavior and its necessary safeguards; avoid speculative
+  features, configurability, and future-proofing.
+- Add an abstraction when it clarifies a real boundary, responsibility, invariant,
+  or repeated behavior. Single use alone is not a reason to forbid it.
+- Preserve error handling and validation required by actual inputs, trust
+  boundaries, and failure behavior. Omit unreachable cases only when supported
+  by the contract, not because they seem unlikely.
+- Judge simplicity by behavior, responsibilities, and maintenance cost rather
+  than a line-count target. Shorter code that hides required behavior is not
+  an improvement.
 
-## 2. Simplicity First
+## Make scoped changes
 
-Minimum code that solves the problem. Nothing speculative.
+Inspect relevant existing edits and preserve them. Follow applicable project
+rules and established patterns. Change adjacent code or formatting only when
+needed for the deliverable; do not bundle unrelated cleanup or redesign.
 
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-- Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes,
-  simplify.
+Remove imports, variables, and other code made unused by this change when safe.
+Mention unrelated debt only when it materially matters; leave it for separately
+assigned work. Necessary fixes across callers, tests, configuration, and
+documentation belong to the same change when their contracts are affected.
 
-## 3. Surgical Changes
+Every changed file should be justified by the request, its acceptance checks,
+or a direct consequence of the implementation.
 
-Touch only what you must. Clean up only your own mess.
+## Verify the outcome
 
-When editing existing code:
+Define observable acceptance criteria. For multi-step work, use a short plan
+connecting meaningful deliverables to checks; a trivial edit needs no formal plan.
 
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it; don't delete it.
+- For a bug, reproduce the failing behavior and add a regression test when
+  practical and valuable.
+- For new behavior or refactoring, check affected contracts and relevant normal
+  and failure paths; compare with the baseline when needed.
+- For low-impact reversible edits, use direct inspection or an appropriate
+  syntax/configuration check rather than tests that mirror the implementation.
+- Use project-required checks and available trusted tools. Do not install
+  dependencies, change environments, or run external/destructive actions merely
+  to obtain a passing result.
+- Distinguish pre-existing failures, new regressions, and environment limitations.
+  Repeat checks after relevant changes or new evidence, not indefinitely.
 
-When your changes create orphans:
-
-- Remove imports, variables, and functions that your changes made unused.
-- Don't remove pre-existing dead code unless asked.
-
-The test: every changed line should be justified by the user's request,
-necessary validation, or a direct consequence of the change.
-
-## 4. Goal-Driven Execution
-
-Define success criteria. Loop until verified.
-
-Transform tasks into verifiable goals:
-
-- "Add validation" → write tests for invalid inputs, then make them pass.
-- "Fix the bug" → write a test that reproduces it, then make it pass.
-- "Refactor X" → ensure tests pass before and after.
-
-For multi-step tasks, state a brief plan:
-
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-
-Strong success criteria let you loop independently. Weak criteria ("make it
-work") require constant clarification.
-
-These guidelines are working if:
-
-- fewer unnecessary changes appear in diffs;
-- fewer rewrites are needed because of overcomplication;
-- clarifying questions come before implementation rather than after mistakes.
+Finish when acceptance and required checks are satisfied, or report the material
+blocker and what remains unverified. Report actual changes and observed results;
+do not present a plan, an unrun test, or an assumption as completed verification.

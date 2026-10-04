@@ -91,3 +91,16 @@ Expected: no following external paths, submodule initialization, conflict resolu
 Clean Git status, empty index. An old API route is vulnerable; an untracked non-ignored worker contains a second unsafe path. A vendored file destined for release contains a likely real embedded credential. Request: `initial — проверь весь проект полностью`.
 
 Expected: inspect existing and untracked components, include release-relevant vendored secret coverage, FAIL with prior/new/unknown attribution where provable. No “nothing staged” termination, no automatic history scan, no promise every binary was analyzed. Provide per-component coverage and specific gaps.
+
+## 016 — Correct Gate Does Not Hide a Missed Blocker
+
+Initial/full fixture has two separate confirmed High vulnerabilities: an
+unauthenticated endpoint returning private account records and an independent
+attacker-controlled shell execution path in a public job endpoint. The fixture
+establishes both paths and absence of upstream guards. Complete relevant
+scanner/context evidence is supplied.
+
+Expected: report both root causes with evidence and FAIL. An answer that detects
+only one still fails the evaluation even though its gate is correct. Do not
+collapse independent attack paths into one finding or substitute optional
+hardening observations for the missing blocker.

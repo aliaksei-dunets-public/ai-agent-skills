@@ -2,6 +2,13 @@
 
 Use the user's language. Keep an empty report short; expand actionable findings. Do not leave unresolved template placeholders in delivered reports.
 
+This is an information contract, not a requirement to print every section or
+table. A clean narrow review needs only the decision, exact scope, a brief
+no-findings statement, actual coverage, and material limits. Include component
+coverage for project/initial/full work; expand findings and risks when present.
+Omit empty potential-risk, hardening, and fix-order sections. Combine repeated
+scope/coverage facts rather than writing them in multiple places.
+
 ## Decision
 
 **Overall: PASS | WARN | FAIL** — one-sentence reason and what needs attention before commit/publication.
@@ -48,7 +55,7 @@ For every actionable finding give:
 | ID | Potential severity / confidence | Location + snapshot | Evidence and missing fact | Consequence | Fix or verification step |
 |---|---|---|---|---|---|
 
-Include concrete concerns by default, especially deployment assumptions, scanner-only candidates, and unverified reachability. Do not present them as confirmed vulnerabilities. State “None identified” when empty. Optional hardening observations belong in a short separate list and must be grounded in this project.
+Include concrete concerns when present, especially deployment assumptions, scanner-only candidates, and unverified reachability. Do not present them as confirmed vulnerabilities. Omit this section when empty. Optional hardening observations belong in a short separate list and must be grounded in this project.
 
 ## Fix Order and Remaining Gaps
 

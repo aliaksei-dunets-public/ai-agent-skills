@@ -1,17 +1,7 @@
 interface:
-  display_name: python code review
-  short_description: 'Perform evidence-based code reviews for Python changes and projects
-    using a
-
-    five-axis quality framework, progressively loaded Python guidance, and an
-
-    independent second-pass reviewer. Use for pull requests, commit ranges,
-
-    uncommitted changes, completed features, bug fixes, refactors, modules, or
-
-    full-project audits. Review only unless the user explicitly requests fixes.'
-  icon_small: assets/icon.svg
-  icon_large: assets/icon.svg
+  display_name: "Python Code Review"
+  short_description: "Evidence-based Python change and project reviews"
+  default_prompt: "Use $python-code-review to review this Python code and report concrete findings, evidence, and verification limits."
 policy:
   products:
   - chatgpt

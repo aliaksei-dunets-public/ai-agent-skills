@@ -1,121 +1,83 @@
-# Python Code Review Skill 2.0
+# Python Code Review 2.2
 
-Платформо-независимый навык для AI coding agents, в котором основным механизмом
-ревью является не чек-лист, а глобальный анализ поведения и архитектуры системы.
+Универсальный навык проверки Python-кода. Он сначала восстанавливает поведение
+затронутой системы, затем проверяет гипотезы о дефектах и использует подходящие
+разделы Python-справочника для поиска пропусков. Анализаторы и зелёные тесты
+дают свидетельства, но не заменяют инженерное ревью.
 
-## Главное изменение версии 2.0
+## Область проверки
 
-Навык сначала заставляет модель:
+- `CHANGE_REVIEW` — diff, PR, ветка, коммит, диапазон или локальные изменения.
+- `COMPONENT_REVIEW` — модуль, пакет, сервис или подсистема.
+- `PROJECT_AUDIT` — проект или крупная область с явной стратегией покрытия.
 
-- восстановить назначение системы и ключевые пользовательские потоки;
-- построить модель компонентов, зависимостей, данных и состояния;
-- определить инварианты, ответственность и жизненный цикл ресурсов;
-- проследить нормальные и аварийные сценарии через несколько файлов и слоёв;
-- самостоятельно сформировать гипотезы о проблемах и попытаться их опровергнуть;
-- оценить архитектурную согласованность и влияние изменений на всю систему.
+Навык различает цель проверки, необходимый окружающий контекст и более широкое
+поведение, на которое влияет изменение. Для маленькой правки достаточно её
+контракта, вызывающего кода и тестов; полный архитектурный аудит не обязателен.
 
-Только после этого применяются пятиосевая схема и Python-справочник. Они служат
-страховочной сеткой для полноты, а не ограничивают способность модели находить
-нестандартные проблемы.
+В Git-проверках учитываются точные версии: staged, рабочие и исторические файлы
+не взаимозаменяемы. При неполном staging исправление в рабочей копии не устраняет
+дефект будущего коммита. Без Git можно проверить явно указанный компонент, но
+нельзя выдумывать базу сравнения.
 
-## Ключевая модель scope
+## Процесс и результат
 
-Навык разделяет:
+Агент изучает требования и существенные границы, прослеживает подходящие нормальные
+и аварийные сценарии, ищет опровержения своих гипотез и оценивает реальные гарантии
+тестов. Глубина зависит от объёма и последствий, а не от обязательного числа фаз.
 
-- **target scope** — что пользователь просит проверить;
-- **context scope** — какой окружающий код нужно прочитать;
-- **system horizon** — какое глобальное поведение может быть затронуто.
+Обычный результат содержит находки с источниками, условиями возникновения,
+последствиями и исправлением, выполненные проверки и ограничения покрытия.
+Вердикт добавляется по запросу или для merge-review. Подробный архитектурный
+отчёт нужен только по запросу или для существенных системных рисков.
 
-Поэтому ревью небольшого diff остаётся сфокусированным в отчёте, но анализирует
-вызовы, данные, БД, конфигурацию, фоновые процессы и архитектурные последствия.
+Независимый reviewer используется, когда он требуется пользователем или проектом
+либо разрешённое делегирование даёт полезную дополнительную проверку. Наличие
+инструмента само по себе не разрешает запуск агента. Повторная проверка той же
+моделью отмечается как self-review и не заменяет обязательное независимое ревью.
 
-## Структура
+## Границы
 
-```text
-python-code-review-skill/
-├── SKILL.md
-├── README.ru.md
-├── THIRD_PARTY_NOTICES.md
-├── references/
-│   ├── system-analysis.md
-│   ├── python-review.md
-│   └── tooling.md
-├── reviewers/
-│   └── independent-reviewer.md
-└── templates/
-    └── review-report.md
-```
+По умолчанию навык проверяет, а не изменяет код. Запрос, включающий исправления,
+разрешает изменения в заданной области с сохранением существующей работы.
 
-## Режимы
+Навык не устанавливает зависимости, не меняет Git-состояние и не запускает
+непроверенные скрипты или внешние действия ради успешного отчёта. Тесты, плагины,
+обёртки окружения и сканеры могут исполнять код или обращаться к сервисам:
+перед запуском агент проверяет доверие, побочные эффекты и разрешённую область.
+Секреты и персональные данные не попадают в отчёт.
 
-- `CHANGE_REVIEW` — PR, ветка, commit range или локальные изменения.
-- `COMPONENT_REVIEW` — модуль, пакет, сервис или отдельная функциональность.
-- `PROJECT_AUDIT` — глобальный аудит архитектуры и качества проекта.
+## Материалы
 
-Для project audit навык использует осознанную выборку: ключевые end-to-end
-потоки, composition roots, общие абстракции, stateful/concurrent code,
-интеграции, БД, тестовую архитектуру и hotspots. В отчёте явно указывается, что
-изучено глубоко, выборочно или не изучено.
+- [SKILL.md](SKILL.md) — основной процесс, области, severity и вердикты.
+- [system-analysis](references/system-analysis.md) — техники анализа сложных границ.
+- [python-review](references/python-review.md) — выборочная Python-проверка.
+- [tooling](references/tooling.md) — выбор команд, доверие и свидетельства.
+- [independent-reviewer](reviewers/independent-reviewer.md) — ограниченное поручение reviewer.
+- [review-report](templates/review-report.md) — краткий контракт результата.
+- [openai.yaml](agents/openai.yaml) — метаданные интерфейса.
 
-## Установка
+Скопируйте папку целиком в поддерживаемый каталог навыков вашего агента,
+сохранив относительные пути.
 
-Скопируйте всю папку в каталог навыков платформы, сохранив относительные пути:
-
-```text
-<project>/.agents/skills/python-code-review/
-<project>/.claude/skills/python-code-review/
-<project>/.github/skills/python-code-review/
-~/.codex/skills/python-code-review/
-```
-
-## Рекомендуемый запуск для глобального анализа
+## Примеры запроса
 
 ```text
-Use python-code-review in PROJECT_AUDIT mode.
-
-First reconstruct the architecture and primary end-to-end workflows. Build a
-model of control flow, data flow, state ownership, resource lifecycle, failure
-propagation, and critical invariants. Perform an open-ended semantic review
-before using any checklist.
-
-Identify systemic design problems, duplicated knowledge, hidden coupling,
-invalid state transitions, fragile boundaries, operational risks, and gaps in
-test architecture. Trace representative normal and failure scenarios across
-files and layers.
-
-Use Python-specific rules only as a final coverage backstop. Clearly distinguish
-confirmed findings, intentional trade-offs, and unknowns. State what was deeply
-inspected, sampled, or not inspected. Dispatch an independent reviewer. Do not
-modify files.
+Use $python-code-review in CHANGE_REVIEW mode for the supplied base and target.
+Review affected behavior and contracts; report concrete findings, observed
+checks, coverage limits, and a merge verdict. Do not modify files.
 ```
-
-## Рекомендуемый запуск для PR
 
 ```text
-Use python-code-review in CHANGE_REVIEW mode for the current branch against
-origin/main.
-
-Keep the verdict focused on the change, but use a broad analysis horizon. First
-understand the affected subsystem and trace the changed behavior end to end
-through callers, persistence, configuration, external boundaries, jobs, and
-tests. Do not start with a checklist.
-
-Run repository-native checks, challenge green tests, use Python guidance as a
-coverage sweep, and dispatch an independent reviewer. Return systemic and local
-findings with evidence and a merge verdict. Do not modify files.
+Use $python-code-review in PROJECT_AUDIT mode for this Python project.
+Inventory components, prioritize core flows and high-risk boundaries, trace
+relevant failures, and disclose inspected, sampled, and uninspected areas.
+Return systemic and local findings without modifying files.
 ```
 
-## Проектная настройка
+## Настройка проекта
 
-В `AGENTS.md` или аналогичной инструкции желательно указать:
-
-- назначение проекта и основные end-to-end потоки;
-- архитектурные слои и допустимые зависимости;
-- composition roots и точки входа;
-- критичные доменные инварианты;
-- правила состояния, транзакций, повторных вызовов и retries;
-- команды unit/integration/end-to-end tests;
-- команды Ruff, mypy/pyright и security checks;
-- поддерживаемую версию Python;
-- правила работы с БД, API, логами, персональными данными и секретами;
-- механизм запуска независимого reviewer.
+Локальные инструкции могут определить доменные инварианты, архитектурные границы,
+поддерживаемые версии Python, разрешённые команды и окружение, правила работы
+с данными и необходимость независимого ревью. Навык следует этим ограничениям
+и не требует конкретного фреймворка или платформы.
