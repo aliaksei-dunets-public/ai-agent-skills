@@ -59,16 +59,11 @@ and verification. Short tasks can fit in one response; do not impose section
 lengths or repeated approvals.
 
 If a material new design decision is needed for assigned implementation, make it
-reviewable before asking for that decision. Reuse existing approval and accepted
-requirements; do not ask again for approval of their written copy. A reviewer's
-technical assessment does not substitute for a user decision.
-
-Save a design only when requested, required by the project, or needed as a durable
-handoff. Use the project's existing location and language. If a file is needed
-and no convention exists, use `docs/design/YYYY-MM-DD-<topic>-design.md`. Mark
-proposal, accepted decision, and remaining questions accurately. Self-review for
-contradictions, scope creep, and ambiguous acceptance. For a separately authorized
-review, use [the spec review reference](references/spec-document-reviewer-prompt.md).
+reviewable in the conversation or handoff before asking for that decision. Reuse
+existing approval and accepted requirements; do not ask again for approval of
+their written copy. A reviewer's technical assessment does not substitute for a
+user decision. Do not create a design or specification file unless the user
+explicitly requests one.
 
 ## Implementation planning
 
@@ -111,6 +106,6 @@ enough context to remain understandable; keep full evidence accessible at source
   acceptance. State which decisions are accepted and which remain proposals.
 - Follow project rules for documents, language, and machine-readable values;
   do not impose another project's paths, tools, storage, or process.
-- Do not automatically install tools, create a worktree, delegate, commit, or
-  publish as part of preparation. Use those actions only within existing scope
-  and authorization.
+- Preparation does not authorize installing tools, creating a worktree,
+  delegating, committing, or publishing. Commit only when the user explicitly
+  requests a commit.
