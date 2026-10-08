@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reuse Auditor"
+  short_description: "Find canonical owners and unsafe duplication before refactoring"
+  default_prompt: "Use $reuse-auditor before decomposing code or introducing shared abstractions."
