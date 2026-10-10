@@ -1,0 +1,48 @@
+{
+  "rubric": {
+    "required": [
+      "non-idempotent retry of an external side effect",
+      "duplicate delivery risk",
+      "idempotency key or outcome check before retry",
+      "bounded retry with escalation"
+    ],
+    "forbidden": [
+      "recommend more retries",
+      "treat a timeout as proof of failure"
+    ]
+  },
+  "checks": {
+    "mode": "deep",
+    "min_findings": 1,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "idempotency",
+        "any": [
+          "idempoten",
+          "dedup"
+        ]
+      },
+      {
+        "id": "duplicates",
+        "any": [
+          "duplicat"
+        ]
+      },
+      {
+        "id": "outcome-check",
+        "any": [
+          "(check|verif|confirm|query)\\w* (the )?(previous |prior )?(outcome|delivery|status|state)",
+          "unknown outcome",
+          "ambiguous"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

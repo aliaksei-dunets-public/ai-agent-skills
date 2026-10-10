@@ -2,13 +2,15 @@
   "platform": "codex",
   "surface": "cli",
   "executable": "codex",
+  "version_command": ["codex", "--version"],
   "install_path": ".agents/skills/optimizer",
-  "prompt_prefix": "Use the optimizer skill explicitly. Audit the following fixture in {mode} mode. Return JSON that follows the supplied result contract.\n\n",
+  "prompt_prefix": "Use the optimizer skill explicitly. Audit the following fixture in {mode} mode.\n",
   "command_template": [
     "codex",
     "exec",
     "--ephemeral",
     "--json",
+    "--skip-git-repo-check",
     "--sandbox",
     "read-only",
     "--cd",
@@ -16,6 +18,16 @@
     "{prompt}"
   ],
   "output_format": "jsonl",
+  "safety": {
+    "write_protection": "sandbox read-only + sandbox mutation check",
+    "verified": true
+  },
+  "activation_signal": {
+    "tool_patterns": [
+      "skills[\\\\/]+optimizer[\\\\/]+SKILL\\.md"
+    ]
+  },
+  "ignore_paths": [],
   "ide_smoke_test_required": false,
-  "notes": "Record model and config overrides. Add an output schema flag only after verifying support in the installed version."
+  "notes": "Record model and config overrides. --output-schema is not used: it expects a strict structured-output schema; verify support before enabling."
 }

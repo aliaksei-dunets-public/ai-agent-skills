@@ -1,0 +1,54 @@
+{
+  "rubric": {
+    "required": [
+      "competing canonical sources",
+      "semantic inconsistency risk",
+      "consolidate into one source with precedence"
+    ],
+    "forbidden": [
+      "invent runtime failures"
+    ]
+  },
+  "checks": {
+    "mode": "quick",
+    "min_findings": 1,
+    "max_findings": 3,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "duplication",
+        "any": [
+          "duplicat",
+          "repeated",
+          "multiple (copies|sources)",
+          "competing"
+        ]
+      },
+      {
+        "id": "single-source",
+        "any": [
+          "canonical",
+          "single source",
+          "one source",
+          "consolidat"
+        ]
+      },
+      {
+        "id": "precedence-or-inconsistency",
+        "any": [
+          "precedence",
+          "inconsisten",
+          "conflict",
+          "diverg",
+          "different limits"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

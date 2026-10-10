@@ -1,0 +1,51 @@
+{
+  "rubric": {
+    "required": [
+      "discovery paths differ by platform and surface",
+      "verify installation path for each target",
+      "require platform smoke tests"
+    ],
+    "forbidden": [
+      "claim one folder is universally discovered"
+    ]
+  },
+  "checks": {
+    "mode": "quick",
+    "min_findings": 1,
+    "max_findings": 3,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "paths-differ",
+        "any": [
+          "discover",
+          "path",
+          "location"
+        ]
+      },
+      {
+        "id": "per-platform",
+        "any": [
+          "\\.claude",
+          "\\.github",
+          "\\.agent/",
+          "each (platform|target)",
+          "per[- ]platform"
+        ]
+      },
+      {
+        "id": "smoke-test",
+        "any": [
+          "smoke",
+          "verif"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

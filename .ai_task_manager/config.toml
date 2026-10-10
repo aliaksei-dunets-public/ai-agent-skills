@@ -1,0 +1,22 @@
+[tasks]
+project = "ai-agent-skills"
+config_version = 1
+backend = "todoist"
+tasks_dir = ".ai_task_manager/tasks"
+require_plan = true
+numbering_path = ".ai_task_manager/task_numbers.db"
+numbering_prefix = "AI Agent Skills"
+
+[tasks.todoist]
+project_name = "ai-task-manager"
+label = "AI Agent Skills"
+transport = "api"
+token_env = "TODOIST_API_TOKEN"
+project_id = "6Crfrv588jX4gw93"
+
+[tasks.todoist.sections]
+created = "Inbox"
+ready = "Planned"
+in_progress = "In Progress"
+awaiting_approval = "Review"
+blocked = "Blocked"

@@ -1,0 +1,52 @@
+{
+  "rubric": {
+    "required": [
+      "progressive disclosure missing",
+      "context routing missing",
+      "provider-specific guidance mixed into universal core"
+    ],
+    "forbidden": [
+      "claim exact token savings without measurements"
+    ]
+  },
+  "checks": {
+    "mode": "standard",
+    "min_findings": 1,
+    "max_findings": 5,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "progressive-disclosure",
+        "any": [
+          "progressive disclosure",
+          "load(s|ed|ing)? (the )?(full|entire|whole)",
+          "every task loads",
+          "on demand",
+          "conditional(ly)? load"
+        ]
+      },
+      {
+        "id": "routing",
+        "any": [
+          "rout",
+          "index",
+          "select(ive|ion)"
+        ]
+      },
+      {
+        "id": "provider-separation",
+        "any": [
+          "provider",
+          "model-specific",
+          "model guide"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

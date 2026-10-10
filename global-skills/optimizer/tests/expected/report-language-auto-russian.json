@@ -1,0 +1,28 @@
+{
+  "rubric": {
+    "required": [
+      "produce the user-facing report in Russian even though the audited artifact is English",
+      "translate headings and explanatory prose consistently",
+      "preserve paths, commands, identifiers, schema keys, and exact quotations",
+      "do not ask a language clarification question"
+    ],
+    "forbidden": [
+      "choose English because the source artifact is English",
+      "mix English headings with Russian prose",
+      "translate file paths, command names, or schema keys"
+    ]
+  },
+  "checks": {
+    "mode": "standard",
+    "min_findings": 1,
+    "max_findings": 5,
+    "report_language": "ru",
+    "no_measured_metrics": true,
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

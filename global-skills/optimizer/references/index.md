@@ -18,6 +18,7 @@ risk. Do not load every reference by default.
 | OpenAI GPT-5.4 only | `providers/openai/gpt-5.4.md` |
 | OpenAI GPT-5.5 only | `providers/openai/gpt-5.5.md` |
 | OpenAI GPT-5.6 only | `providers/openai/gpt-5.6.md` |
+| OpenAI model without a dedicated file (for example a newer release) | `providers/openai/common.md` only |
 | Any IDE/CLI coding-agent platform | `platforms/common.md` |
 | OpenAI Codex | `platforms/codex.md` |
 | Google Antigravity | `platforms/google-antigravity.md` |
@@ -27,7 +28,10 @@ risk. Do not load every reference by default.
 ## Routing rules
 
 1. Select by concrete audit question, not by curiosity.
-2. Load the provider common file plus only the active model file.
+2. Load the provider common file plus only the active model file. For a model
+   without a dedicated file, use the common file alone, do not borrow another
+   model's file, and verify current official documentation before giving
+   model-specific advice. Add a model file only when verified differences exist.
 3. Load `platforms/common.md` plus only the active platform/surface file.
 4. Do not apply model- or platform-specific advice elsewhere without evidence.
 5. Treat IDE and CLI as separate surfaces unless parity is verified.

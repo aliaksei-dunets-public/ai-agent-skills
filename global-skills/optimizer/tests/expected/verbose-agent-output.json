@@ -1,0 +1,64 @@
+{
+  "rubric": {
+    "required": [
+      "generic brevity instruction is insufficient",
+      "define audience-specific required and omitted information",
+      "recommend compact standard and detailed response modes where applicable",
+      "separate analysis depth from returned response length",
+      "define expansion conditions for risk failure conflict or insufficient evidence",
+      "evaluate task success together with output tokens and follow-up turns"
+    ],
+    "forbidden": [
+      "recommend shallow analysis to reduce tokens",
+      "remove validation evidence or material risks",
+      "impose one hard token limit on every task type"
+    ]
+  },
+  "checks": {
+    "mode": "standard",
+    "min_findings": 1,
+    "max_findings": 5,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "generic-brevity",
+        "any": [
+          "be concise",
+          "generic",
+          "brevity",
+          "vague"
+        ]
+      },
+      {
+        "id": "audience-contract",
+        "any": [
+          "audience",
+          "consumer",
+          "output contract",
+          "required information"
+        ]
+      },
+      {
+        "id": "depth-vs-length",
+        "any": [
+          "depth",
+          "analysis"
+        ]
+      },
+      {
+        "id": "expansion",
+        "any": [
+          "expan",
+          "detailed mode",
+          "when (a )?(risk|failure)"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

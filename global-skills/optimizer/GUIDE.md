@@ -132,7 +132,9 @@ python scripts/install_platform.py --repo /path/to/repository --platform codex
 python scripts/install_platform.py --repo /path/to/repository --platform all
 ```
 
-Copy mode is the default. Re-run the installer with `--force` when upgrading.
+Copy mode is the default. Re-run the installer with `--force` when upgrading;
+the new copy is staged and verified before it replaces the old one, so a
+failed copy keeps the previous installation. `--exclude-dev` omits `tests/`.
 Use symlink mode only when the development environment and repository workflow
 support it reliably. Keep this package as the canonical source rather than
 editing several installed copies independently.
@@ -150,26 +152,29 @@ permissions.
 Inspect commands without executing agents:
 
 ```bash
-python scripts/run_platform_eval.py \
-  --platform all \
-  --workspace /path/to/fixture \
-  --dry-run
+python scripts/run_platform_eval.py --platform all --dry-run
 ```
 
-Run one fixture:
+Run one fixture and compare runs:
 
 ```bash
-python scripts/run_platform_eval.py \
-  --platform codex \
-  --workspace /path/to/fixture \
-  --case monolithic-prompt \
-  --out tests/runs
+python scripts/run_platform_eval.py --platform codex --case monolithic-prompt --label baseline
+python scripts/summarize_runs.py --baseline <run_id> --candidate <run_id>
 ```
 
-The runner uses read-only or plan-oriented defaults where the platform exposes
-them, disables persistence where supported, and bounds available turns, budget,
-or credits. It captures execution evidence but does not replace semantic grading
-or IDE smoke tests. See `evals/README.md`.
+Each case runs in a disposable sandbox with a verified optimizer installation
+and no access to grading keys. Results are graded afterwards for schema
+validity and deterministic case checks; activation and write protection must
+be proven for `PASS`, otherwise the verdict is at most `UNVERIFIED`. Profiles
+without verified write protection are blocked unless explicitly allowed.
+Runs are stored per run ID and never overwritten. The runner does not replace
+rubric review or IDE smoke tests. See `evals/README.md`.
+
+## Machine-readable result
+
+`schemas/eval-result.schema.json` is the canonical machine-readable result:
+the Finding Contract fields plus `metadata` and `no_material_issue`. The
+Markdown report is the human rendering of the same content.
 
 ## Reference extension contract
 
@@ -197,9 +202,12 @@ Run:
 
 ```bash
 python scripts/validate_skill.py
+python -B -m unittest discover -s tests/unit
 ```
 
-The validator checks structure, frontmatter, references, code fences, size
-limits, platform config safety, source freshness metadata, fixture completeness,
-and unexpected binary files. LLM behavior tests require execution by a target
-platform or an external grader.
+The validator checks structure, frontmatter, references (including paths
+relative to the referencing file and the routing index), code fences, size
+limits, platform config safety and installer consistency, source freshness
+metadata, fixture completeness and grading-spec format, and unexpected binary
+files. Unit tests cover the scripts without an LLM. Behavior tests require
+execution by a target platform.

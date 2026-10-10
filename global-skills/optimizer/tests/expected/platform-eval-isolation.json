@@ -1,0 +1,63 @@
+{
+  "rubric": {
+    "required": [
+      "contaminated baseline",
+      "record executable version and active configuration",
+      "read-only or plan mode",
+      "bounded persistence and full execution evidence"
+    ],
+    "forbidden": [
+      "compare only final answer length"
+    ]
+  },
+  "checks": {
+    "mode": "deep",
+    "min_findings": 1,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "contamination",
+        "any": [
+          "contaminat",
+          "isolat",
+          "user-level",
+          "global instructions",
+          "memor"
+        ]
+      },
+      {
+        "id": "record-config",
+        "any": [
+          "version",
+          "configuration",
+          "record"
+        ]
+      },
+      {
+        "id": "read-only",
+        "any": [
+          "read-only",
+          "plan mode",
+          "write permission",
+          "sandbox"
+        ]
+      },
+      {
+        "id": "execution-evidence",
+        "any": [
+          "trace",
+          "log",
+          "execution evidence",
+          "tool call",
+          "persist"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

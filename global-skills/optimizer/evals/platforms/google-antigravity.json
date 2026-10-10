@@ -2,14 +2,23 @@
   "platform": "google-antigravity",
   "surface": "cli-proxy",
   "executable": "agy",
+  "version_command": ["agy", "--version"],
   "install_path": ".agent/skills/optimizer",
-  "prompt_prefix": "Use the optimizer skill. Audit the following fixture in {mode} mode. Use compact structured output.\n\n",
+  "prompt_prefix": "Use the optimizer skill. Audit the following fixture in {mode} mode.\n",
   "command_template": [
     "agy",
     "-p",
     "{prompt}"
   ],
   "output_format": "text",
+  "safety": {
+    "write_protection": "none verified; sandbox mutation check only",
+    "verified": false
+  },
+  "activation_signal": {
+    "tool_patterns": []
+  },
+  "ignore_paths": [],
   "ide_smoke_test_required": true,
-  "notes": "Verify the installed CLI command and feature set. IDE/standalone skill discovery and tools may differ."
+  "notes": "Verify the installed CLI command, a read-only mode, and the feature set. IDE/standalone skill discovery and tools may differ. Runs only with --allow-unverified-sandbox."
 }

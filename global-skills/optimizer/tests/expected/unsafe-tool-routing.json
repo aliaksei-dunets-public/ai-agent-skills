@@ -1,0 +1,56 @@
+{
+  "rubric": {
+    "required": [
+      "untrusted content crossing instruction boundary",
+      "external write side effect",
+      "idempotency and retry risk",
+      "approval and rollback gap"
+    ],
+    "forbidden": [
+      "treat prompt wording as sufficient authorization control"
+    ]
+  },
+  "checks": {
+    "mode": "deep",
+    "min_findings": 1,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "untrusted-instructions",
+        "any": [
+          "untrusted",
+          "inject",
+          "web (content|page)"
+        ]
+      },
+      {
+        "id": "external-write",
+        "any": [
+          "external write",
+          "side[- ]effect",
+          "write API"
+        ]
+      },
+      {
+        "id": "idempotency",
+        "any": [
+          "idempoten"
+        ]
+      },
+      {
+        "id": "approval-rollback",
+        "any": [
+          "approval",
+          "rollback",
+          "confirm"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

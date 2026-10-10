@@ -9,6 +9,10 @@ import re
 import sys
 from pathlib import Path
 
+sys.dont_write_bytecode = True  # keep the package free of __pycache__
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from install_platform import TARGETS  # noqa: E402
+
 PLATFORM_CONFIGS = {
     "codex": "evals/platforms/codex.json",
     "google-antigravity": "evals/platforms/google-antigravity.json",
@@ -47,10 +51,19 @@ REQUIRED = {
     "schemas/eval-result.schema.json",
     "scripts/install_platform.py",
     "scripts/run_platform_eval.py",
+    "scripts/grade_result.py",
+    "scripts/summarize_runs.py",
     "tests/README.md",
-    "tests/cases/report-language-selection.md",
-    "tests/expected/report-language-selection.yaml",
+    "tests/cases/report-language-auto-russian.md",
+    "tests/expected/report-language-auto-russian.json",
+    "tests/cases/report-language-explicit-override.md",
+    "tests/expected/report-language-explicit-override.json",
 }
+# Run results are local evidence, not package content.
+SKIPPED_DIRS = ("tests/runs/",)
+# Fixtures describe hypothetical artifacts whose paths do not exist here.
+REFERENCE_CHECK_EXEMPT = ("tests/cases/",)
+INTERNAL_REF = re.compile(r"^[A-Za-z0-9_-][A-Za-z0-9_.-]*(?:/[A-Za-z0-9_.-]+)+\.(?:md|json|py|ya?ml)$")
 TEXT_SUFFIXES = {".md", ".yaml", ".yml", ".py", ".txt", ".json", ""}
 MAX_SKILL_LINES = 350
 MAX_SKILL_BYTES = 18_000
@@ -87,12 +100,48 @@ def code_fences_balanced(text: str) -> bool:
 
 
 def referenced_paths(text: str) -> set[str]:
+    """Backticked relative file paths, such as `audit/security-trust.md`."""
     refs = set()
-    for value in re.findall(r"`((?:references|tests|scripts|evals|schemas)/[^`]+)`", text):
+    for value in re.findall(r"`([^`\s]+)`", text):
         value = value.rstrip(".,;:")
-        if not any(ch in value for ch in "*<>|") and "{" not in value:
+        if INTERNAL_REF.match(value):
             refs.add(value)
     return refs
+
+
+def reference_exists(root: Path, source: Path, ref: str) -> bool:
+    """Resolve from the package root, the referencing file, or the routing index."""
+    bases = (root, source.parent, root / "references")
+    return any((base / ref).is_file() for base in bases)
+
+
+def validate_expected(root: Path, errors: list[str]) -> None:
+    for path in sorted((root / "tests/expected").glob("*.json")):
+        rel = path.relative_to(root).as_posix()
+        try:
+            spec = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            errors.append(f"invalid expected spec {rel}: {exc}")
+            continue
+        rubric, checks = spec.get("rubric"), spec.get("checks")
+        if not isinstance(rubric, dict) or not isinstance(checks, dict):
+            errors.append(f"expected spec {rel} needs rubric and checks objects")
+            continue
+        if not checks:
+            errors.append(f"expected spec {rel} has no deterministic checks")
+        patterns = [p for c in checks.get("required_concepts", []) for p in c.get("any", [])]
+        patterns += [f.get("pattern", "") for f in checks.get("forbidden_patterns", [])]
+        for pattern in patterns:
+            try:
+                re.compile(pattern)
+            except re.error as exc:
+                errors.append(f"invalid regex in {rel}: {pattern!r}: {exc}")
+        case = root / "tests/cases" / f"{path.stem}.md"
+        if case.exists() and "mode" in checks:
+            match = re.search(r"^mode:\s*(\S+)", case.read_text(encoding="utf-8"), re.IGNORECASE | re.MULTILINE)
+            mode = match.group(1) if match else "standard"
+            if mode != checks["mode"]:
+                errors.append(f"expected spec {rel} mode {checks['mode']!r} differs from case mode {mode!r}")
 
 
 def validate_platform_config(root: Path, rel: str, errors: list[str]) -> dict | None:
@@ -119,15 +168,32 @@ def validate_platform_config(root: Path, rel: str, errors: list[str]) -> dict | 
     install_path = str(data.get("install_path", ""))
     if install_path.startswith("/") or ".." in Path(install_path).parts:
         errors.append(f"platform config {rel} install_path must be repository-relative")
+    expected_target = TARGETS.get(str(data.get("platform")))
+    if expected_target is None or Path(install_path) != expected_target:
+        errors.append(f"platform config {rel} install_path differs from the installer target")
     if "{prompt}" not in command:
         errors.append(f"platform config {rel} does not pass the prompt placeholder")
+    safety = data.get("safety")
+    if not isinstance(safety, dict) or not isinstance(safety.get("verified"), bool) or not safety.get("write_protection"):
+        errors.append(f"platform config {rel} needs safety.write_protection and boolean safety.verified")
+    patterns = (data.get("activation_signal") or {}).get("tool_patterns")
+    if not isinstance(patterns, list):
+        errors.append(f"platform config {rel} needs activation_signal.tool_patterns (may be empty)")
+    else:
+        for pattern in patterns:
+            try:
+                re.compile(pattern)
+            except re.error as exc:
+                errors.append(f"invalid activation pattern in {rel}: {exc}")
     return data
 
 
 def validate(root: Path) -> dict:
     errors: list[str] = []
     warnings: list[str] = []
-    all_files = {p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()}
+    files = [p for p in root.rglob("*")
+             if p.is_file() and not p.relative_to(root).as_posix().startswith(SKIPPED_DIRS)]
+    all_files = {p.relative_to(root).as_posix() for p in files}
 
     for rel in sorted(REQUIRED - all_files):
         errors.append(f"missing required file: {rel}")
@@ -148,15 +214,14 @@ def validate(root: Path) -> dict:
             errors.append(f"SKILL.md too large: {size} bytes > {MAX_SKILL_BYTES}")
 
     case_names = {p.stem for p in (root / "tests/cases").glob("*.md")}
-    expected_names = {p.stem for p in (root / "tests/expected").glob("*.yaml")}
+    expected_names = {p.stem for p in (root / "tests/expected").glob("*.json")}
     if case_names != expected_names:
         errors.append(f"fixture mismatch: cases={sorted(case_names)} expected={sorted(expected_names)}")
     if len(case_names) < 12:
         warnings.append(f"only {len(case_names)} behavioral fixtures")
+    validate_expected(root, errors)
 
-    for path in root.rglob("*"):
-        if not path.is_file():
-            continue
+    for path in files:
         rel = path.relative_to(root).as_posix()
         if "__pycache__" in path.parts or path.suffix.lower() == ".pyc":
             errors.append(f"generated Python artifact included: {rel}")
@@ -173,9 +238,10 @@ def validate(root: Path) -> dict:
             warnings.append(f"BOM found: {rel}")
         if path.suffix == ".md" and not code_fences_balanced(text):
             errors.append(f"unbalanced code fences: {rel}")
-        for ref in referenced_paths(text):
-            if not (root / ref).exists():
-                errors.append(f"broken internal reference in {rel}: {ref}")
+        if path.suffix == ".md" and not rel.startswith(REFERENCE_CHECK_EXEMPT):
+            for ref in sorted(referenced_paths(text)):
+                if not reference_exists(root, path, ref):
+                    errors.append(f"broken internal reference in {rel}: {ref}")
         if rel.startswith(("references/providers/", "references/platforms/")):
             if "checked_at:" not in text:
                 errors.append(f"missing checked_at metadata: {rel}")

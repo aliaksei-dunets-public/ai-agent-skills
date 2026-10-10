@@ -1,0 +1,61 @@
+{
+  "rubric": {
+    "required": [
+      "duplicated canonical workflow across platform adapters",
+      "always-on context waste",
+      "one canonical source with thin platform adapters",
+      "explicit precedence and versioning"
+    ],
+    "forbidden": [
+      "recommend maintaining four independent full copies"
+    ]
+  },
+  "checks": {
+    "mode": "standard",
+    "min_findings": 1,
+    "max_findings": 5,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "duplication",
+        "any": [
+          "duplicat",
+          "copied",
+          "copies"
+        ]
+      },
+      {
+        "id": "always-on",
+        "any": [
+          "always[- ]on",
+          "context (waste|cost|budget)",
+          "every (session|task)",
+          "token"
+        ]
+      },
+      {
+        "id": "thin-adapters",
+        "any": [
+          "canonical",
+          "single source",
+          "thin",
+          "adapter"
+        ]
+      },
+      {
+        "id": "precedence",
+        "any": [
+          "precedence",
+          "version",
+          "conflict"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

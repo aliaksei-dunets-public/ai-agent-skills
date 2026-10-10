@@ -110,7 +110,8 @@ Typical routing:
 - trust, injection, permissions: `audit/security-trust.md`;
 - tokens, cost, evals, confidence: `audit/evaluation-metrics.md`;
 - response length, audience, handoffs: `audit/output-contract.md`;
-- provider/model guidance: the matching provider file only;
+- provider/model guidance: the matching model file, or only the provider
+  common file when no model file exists;
 - Codex, Antigravity, Copilot VS Code, or Claude VS Code: load
   `platforms/common.md` plus only the matching platform file.
 
@@ -181,7 +182,6 @@ Do not continue scanning merely to create more findings.
 Use this compact schema and omit empty fields:
 
 ```yaml
-schema_version: "1.0"
 id: OPT-001
 severity: high
 confidence: high
@@ -206,6 +206,11 @@ Confidence rubric:
 - `high`: directly supported by text, configuration, trace, or metric;
 - `medium`: strongly implied by structure but missing runtime evidence;
 - `low`: plausible hypothesis requiring additional evidence.
+
+When a machine-readable result is requested, for example by an eval harness,
+return one JSON object conforming to `schemas/eval-result.schema.json`: these
+finding fields plus `metadata` (mode, report language) and `no_material_issue`.
+Schema keys stay canonical; prose values follow the report language rules below.
 
 ## Output Contract
 

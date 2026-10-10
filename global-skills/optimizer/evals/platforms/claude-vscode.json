@@ -2,23 +2,38 @@
   "platform": "claude-vscode",
   "surface": "cli-proxy",
   "executable": "claude",
+  "version_command": ["claude", "--version"],
   "install_path": ".claude/skills/optimizer",
-  "prompt_prefix": "Use the optimizer skill. Audit the following fixture in {mode} mode. Return JSON compatible with the optimizer result contract.\n\n",
+  "prompt_prefix": "Use the optimizer skill. Audit the following fixture in {mode} mode.\n",
   "command_template": [
     "claude",
     "-p",
     "{prompt}",
     "--output-format",
-    "json",
+    "stream-json",
+    "--verbose",
     "--permission-mode",
     "plan",
+    "--disallowedTools",
+    "Write,Edit,NotebookEdit",
     "--max-turns",
     "{max_turns}",
     "--max-budget-usd",
     "{budget_usd}",
     "--no-session-persistence"
   ],
-  "output_format": "json",
+  "output_format": "stream-json",
+  "safety": {
+    "write_protection": "permission-mode plan + disallowed write tools + sandbox mutation check",
+    "verified": true
+  },
+  "activation_signal": {
+    "tool_patterns": [
+      "\"name\": \"Skill\".*optimizer",
+      "skills[\\\\/]+optimizer[\\\\/]+SKILL\\.md"
+    ]
+  },
+  "ignore_paths": [],
   "ide_smoke_test_required": true,
-  "notes": "Claude CLI is the automated regression surface for Claude Code VS Code; verify extension references, hooks, and permissions separately."
+  "notes": "Claude CLI is the automated regression surface for Claude Code VS Code; verify extension references, hooks, and permissions separately. stream-json exposes tool calls used as the activation signal."
 }

@@ -1,0 +1,70 @@
+{
+  "rubric": {
+    "required": [
+      "identify verbose handoff and unbounded state growth",
+      "recommend a compact structured handoff contract",
+      "recommend delta-only communication and state consolidation",
+      "omit empty fields and repeated assignment text",
+      "filter tool output while retaining evidence pointers",
+      "prohibit internal reasoning or chain-of-thought in handoffs"
+    ],
+    "forbidden": [
+      "pass full conversation history to every subagent",
+      "require every optional field to be populated",
+      "replace material evidence with unsupported summaries"
+    ]
+  },
+  "checks": {
+    "mode": "standard",
+    "min_findings": 1,
+    "max_findings": 5,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "verbose-handoff",
+        "any": [
+          "verbose",
+          "narrative",
+          "full (assignment|history|report)",
+          "unbounded"
+        ]
+      },
+      {
+        "id": "structured-handoff",
+        "any": [
+          "structured",
+          "schema",
+          "contract"
+        ]
+      },
+      {
+        "id": "delta",
+        "any": [
+          "delta",
+          "only (the )?chang"
+        ]
+      },
+      {
+        "id": "no-reasoning",
+        "any": [
+          "reasoning",
+          "chain[- ]of[- ]thought"
+        ]
+      },
+      {
+        "id": "tool-output",
+        "any": [
+          "(raw )?tool output",
+          "evidence pointer",
+          "filter"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

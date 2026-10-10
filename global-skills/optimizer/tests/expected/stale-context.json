@@ -1,0 +1,48 @@
+{
+  "rubric": {
+    "required": [
+      "stale summary treated as authority",
+      "no source pointers or freshness metadata",
+      "revalidate or invalidate after source changes",
+      "keep the summary derived from sources"
+    ],
+    "forbidden": [
+      "recommend deleting all memory",
+      "claim measured savings"
+    ]
+  },
+  "checks": {
+    "mode": "standard",
+    "min_findings": 1,
+    "max_findings": 5,
+    "no_measured_metrics": true,
+    "required_concepts": [
+      {
+        "id": "stale",
+        "any": [
+          "stale",
+          "outdated",
+          "out of date",
+          "fresh"
+        ]
+      },
+      {
+        "id": "revalidate",
+        "any": [
+          "revalidat",
+          "invalidat",
+          "re-?verif",
+          "refresh",
+          "source (pointer|of truth)",
+          "timestamp"
+        ]
+      }
+    ],
+    "forbidden_patterns": [
+      {
+        "id": "fabricated-savings",
+        "pattern": "\\d+(\\.\\d+)?\\s*%\\s*(fewer|less|lower|token|saving|reduction|cheaper)"
+      }
+    ]
+  }
+}

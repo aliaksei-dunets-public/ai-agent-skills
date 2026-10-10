@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.8.0 — 2026-10-11
+
+- Eval prompts no longer contain expected results; grading keys moved to
+  `tests/expected/*.json` (rubric plus deterministic checks) and are read only
+  by the new `scripts/grade_result.py` after execution.
+- A zero exit code no longer means PASS: results report execution, install,
+  activation, safety, schema validity, semantic checks, and a pending rubric
+  review separately, with verdicts PASS, UNVERIFIED, FAIL, and BLOCKED.
+- Each case runs in a disposable sandbox with a verified (path, version, hash)
+  installation that excludes `tests/`; sandbox mutations fail the case;
+  profiles without verified write protection are blocked unless allowed.
+- Skill activation is verified from tool-call events only; Claude runs use
+  `stream-json`, Codex runs skip the git-repo check.
+- Canonical machine-readable result schema 2.0 aligned with the Finding
+  Contract and referenced from `SKILL.md`.
+- Runs are stored per unique run ID with git SHA, skill hash, CLI version,
+  config, limits, usage, cost, and turns (`unknown` when unavailable); added
+  `scripts/summarize_runs.py` for success rate, latency percentiles, and
+  tokens and cost per successful task, including baseline/candidate comparison.
+- Fixed: relative reference checking in the validator, `TimeoutExpired` bytes
+  output crashing the runner, and non-atomic `--force` installation.
+- Split the combined language fixture and added fixtures for stale context,
+  contradictory instructions, tool failure, output overcompression, missing
+  evidence, side-effect retry, partial results, and zero findings.
+- Added a provider fallback rule for models without a dedicated reference file.
+- Added deterministic unit tests for the scripts.
+
 ## 1.7.0 — 2026-10-04
 
 - Clarified portable optimization boundaries: read-only

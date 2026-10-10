@@ -1,0 +1,10 @@
+tasks/
+migration.json
+config.local.toml
+backups/
+*.db
+*.db-*
+tasks.db
+tasks.db-*
+task_numbers.db
+task_numbers.db-*
