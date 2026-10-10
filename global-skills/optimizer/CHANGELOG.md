@@ -1,6 +1,19 @@
 # Changelog
 
-## 1.8.0 — 2026-10-11
+## 2.0.0 — 2026-10-11
+
+- Refocused optimizer on expert audit and repair of instruction packages:
+  integrity checks (links, files, names, versions), content audit
+  (contradictions, duplication, ambiguity, activation, layering, safety,
+  output contract), and coordinated fixes across references and documentation.
+- Two modes: `audit` (report only) and `fix` (audit, apply, verify).
+- Consolidated references into `checklist.md`, `best-practices.md`, and
+  `platforms.md`.
+- Removed the platform eval harness, scripts, schemas, and fixtures, and the
+  model-specific provider notes; the skill works with the agent's own file
+  tools.
+
+## 1.8.0 — 2026-10-11 (not released; superseded by 2.0.0)
 
 - Eval prompts no longer contain expected results; grading keys moved to
   `tests/expected/*.json` (rubric plus deterministic checks) and are read only

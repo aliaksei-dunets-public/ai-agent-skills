@@ -1,213 +1,54 @@
 # Optimizer Guide
 
-## What it audits
+Optimizer reviews and repairs packages of agent instructions — skills, agent
+definitions, always-on instruction files, references, examples, and their
+documentation — the way an experienced prompt engineer would: it finds what is
+broken, inconsistent, contradictory, duplicated, or unclear, and then fixes it.
 
-Optimizer reviews the design of existing prompts, skills, agents, subagent
-workflows, tool policies, context pipelines, model/runtime configuration, and
-platform-specific instruction layers. It does not perform the domain task of
-the audited agent.
+For a single standalone prompt, use the `prompter` skill instead.
 
-## Recommended requests
+## What it checks
 
-- `Audit this skill in standard mode. Focus on token usage and stability.`
-- `Compare these two prompt versions using the supplied traces and metrics.`
-- `Run a deep audit of this multi-agent workflow, including trust boundaries and write-tool safety.`
-- `Audit this repository for Codex, Antigravity, Copilot VS Code, and Claude VS Code compatibility.`
-- `Optimize this agent output contract: preserve evidence but reduce verbose user responses and subagent handoffs.`
-- `Apply the approved recommendations and update the self-tests.`
+- **Integrity:** broken links and paths, missing or orphaned files, names and
+  versions that disagree between files, malformed frontmatter or Markdown,
+  outdated examples.
+- **Content:** contradictions, duplicated rules, vague instructions, weak
+  activation descriptions, content in the wrong layer, unconditional loading,
+  missing failure handling, unsafe tool or delegation design, unclear output
+  contracts.
+- **Documentation:** README/guide, changelog, and version reflect the current
+  behavior.
 
-## Evidence that improves results
-
-Provide any available:
-
-- folder structure and entry-point prompts;
-- target platform and surface: IDE, CLI, or both;
-- tool schemas and permissions;
-- model and runtime configuration;
-- representative task traces;
-- token, latency, and cost usage;
-- successful and failed examples;
-- expected outputs or graders.
-
-The skill can still perform a static audit without runtime evidence, but it must
-label inferred behavior and lower confidence.
-
-Audit and comparison requests leave target artifacts unchanged unless fixes are
-also requested. Optimization records a baseline and preserves existing work.
-Static checks and scenario review can validate instruction consistency, but do
-not establish runtime savings. Separate prescribed, enforced, and observed
-behavior when presenting evidence.
+The full list is in `references/checklist.md`; the rules used when rewriting
+are in `references/best-practices.md`; platform notes (Codex, Claude Code,
+Copilot, Antigravity) are in `references/platforms.md`.
 
 ## Modes
 
-- `quick`: compact report with up to three material findings.
-- `standard`: default compact report with up to five material findings.
-- `deep`: explicitly requested appendices for complex systems or formal reviews.
-- `compare`: compact findings plus before/after metrics.
-- `optimize`: compact findings, applied changes, questions, and resulting metrics.
+- **audit** — findings and proposed fixes, no changes.
+- **fix** — audit, then apply the fixes and update related documentation.
 
+## Example requests
 
-## Report language
+- `Audit the skill in skills/release-helper.`
+- `Check this agent package for broken links and contradictions, then fix it.`
+- `Clean up AGENTS.md and CLAUDE.md — they duplicate each other.`
+- `Review our Copilot instructions and custom agents for conflicts.`
 
-Optimizer automatically writes the user-facing report in:
+## What you get
 
-1. the explicitly requested language; otherwise
-2. the language of the latest substantive user request; otherwise
-3. the most recent explicit user-facing language from the active context or the
-   configured user/environment default.
+1. **Findings** — severity, location, problem, fix;
+2. **Changes** — files changed (fix mode);
+3. **Questions** — only decisions that need you, such as which side of a
+   contradiction is intended;
+4. **Checks** — what was verified after the changes.
 
-For mixed-language requests, code, paths, commands, identifiers, product names,
-and quoted source text do not determine the report language. These technical
-elements remain unchanged unless translation is explicitly requested. The
-language of the audited prompt or skill does not override the user's language.
+Optimizer keeps the author's intent, capabilities, language, and safety
+requirements, changes only what its findings justify, and does not claim
+measured improvements it did not measure.
 
-## Default report
+## Installation
 
-Optimizer returns only:
-
-1. **Important Findings** — material root problems with short evidence, impact,
-   and action;
-2. **Recommended Changes** or **Applied Changes** — concrete actions or files;
-3. **Questions** — only unresolved material or blocking decisions, omitted when
-   none exist;
-4. **Metrics** — measured current or before/after values plus one validation
-   line.
-
-The default report does not include a separate executive summary, execution
-model, scorecard, recommendation section, target architecture, or implementation
-plan. These are optional deep appendices and must not repeat the compact report.
-
-Example:
-
-```markdown
-## Important Findings
-
-1. **[High] Unconditional reference loading** — `SKILL.md:72`.
-   Impact: high input-token cost. Action: add conditional routing.
-
-## Applied Changes
-
-- Added `references/index.md` and removed duplicated loading rules.
-
-## Metrics
-
-| Metric | Before | After | Change |
-|---|---:|---:|---:|
-| Estimated core tokens | 2,600 | 1,800 | -31% |
-
-Validation: PASS — 12 fixtures, 0 broken references.
-```
-
-
-## Compact response optimization
-
-Optimizer treats answer length as an information-contract problem, not as a
-simple `be concise` instruction. It audits:
-
-- whether the consumer is a user, orchestrator, peer agent, machine, or durable artifact;
-- required information versus low-value narration and repetition;
-- `compact`, `standard`, and `detailed` response modes;
-- expansion conditions for critical risk, failed validation, conflict, or insufficient evidence;
-- delta-only handoffs when task state already exists;
-- whether verbosity belongs in the prompt, runtime, schema, or application layer;
-- whether shorter output causes missing evidence, extra turns, retries, or quality regression.
-
-Load `references/audit/output-contract.md` for diagnosis and
-`references/patterns/compact-response.md` only when implementing a confirmed
-output-efficiency improvement.
-
-## Supported platform adapters
-
-| Platform | Recommended repository installation |
-|---|---|
-| OpenAI Codex | `.agents/skills/optimizer/` |
-| Google Antigravity CLI | `.agent/skills/optimizer/` |
-| GitHub Copilot in VS Code | `.github/skills/optimizer/` |
-| Claude Code for VS Code | `.claude/skills/optimizer/` |
-
-Install one or all adapters with:
-
-```bash
-python scripts/install_platform.py --repo /path/to/repository --platform codex
-python scripts/install_platform.py --repo /path/to/repository --platform all
-```
-
-Copy mode is the default. Re-run the installer with `--force` when upgrading;
-the new copy is staged and verified before it replaces the old one, so a
-failed copy keeps the previous installation. `--exclude-dev` omits `tests/`.
-Use symlink mode only when the development environment and repository workflow
-support it reliably. Keep this package as the canonical source rather than
-editing several installed copies independently.
-
-## Platform-specific audit behavior
-
-Load `references/platforms/common.md` and only the matching platform file.
-Always distinguish the IDE extension from a CLI proxy. Automated CLI regression
-is useful, but Copilot VS Code, Claude VS Code, and Antigravity IDE still need a
-smoke test that confirms discovered skills, references, model, tools, and
-permissions.
-
-## Platform eval runner
-
-Inspect commands without executing agents:
-
-```bash
-python scripts/run_platform_eval.py --platform all --dry-run
-```
-
-Run one fixture and compare runs:
-
-```bash
-python scripts/run_platform_eval.py --platform codex --case monolithic-prompt --label baseline
-python scripts/summarize_runs.py --baseline <run_id> --candidate <run_id>
-```
-
-Each case runs in a disposable sandbox with a verified optimizer installation
-and no access to grading keys. Results are graded afterwards for schema
-validity and deterministic case checks; activation and write protection must
-be proven for `PASS`, otherwise the verdict is at most `UNVERIFIED`. Profiles
-without verified write protection are blocked unless explicitly allowed.
-Runs are stored per run ID and never overwritten. The runner does not replace
-rubric review or IDE smoke tests. See `evals/README.md`.
-
-## Machine-readable result
-
-`schemas/eval-result.schema.json` is the canonical machine-readable result:
-the Finding Contract fields plus `metadata` and `no_material_issue`. The
-Markdown report is the human rendering of the same content.
-
-## Reference extension contract
-
-Keep universal behavior in `SKILL.md`. Add provider- or platform-specific
-knowledge below `references/providers/<provider>/` or `references/platforms/`
-and register it in `references/index.md`.
-
-Each changing source should declare:
-
-```yaml
-platform: claude-code
-surface: vscode
-checked_at: 2026-07-14
-verification_required_for:
-  - current feature availability
-  - instruction discovery paths
-```
-
-When current verification is unavailable, treat version-specific guidance as
-potentially stale rather than as a guaranteed current behavior.
-
-## Validation
-
-Run:
-
-```bash
-python scripts/validate_skill.py
-python -B -m unittest discover -s tests/unit
-```
-
-The validator checks structure, frontmatter, references (including paths
-relative to the referencing file and the routing index), code fences, size
-limits, platform config safety and installer consistency, source freshness
-metadata, fixture completeness and grading-spec format, and unexpected binary
-files. Unit tests cover the scripts without an LLM. Behavior tests require
-execution by a target platform.
+Copy the `optimizer` folder into the skill directory of your platform, for
+example `.claude/skills/optimizer/`, `.agents/skills/optimizer/`,
+`.github/skills/optimizer/`, or `.agent/skills/optimizer/`.
