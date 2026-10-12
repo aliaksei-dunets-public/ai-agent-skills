@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.1 — 2026-10-12
+
+- Clarified incremental inspection: inventory/link map first, then coherent
+  scope batches and affected incoming routes. Exhaustive requests continue
+  across batches; partial/unreadable coverage remains explicit.
+- Scoped verification claims to inspected and affected files; unlinked files
+  are investigation candidates, not automatic deletion targets.
+
 ## 2.0.0 — 2026-10-11
 
 - Refocused optimizer on expert audit and repair of instruction packages:
