@@ -17,5 +17,5 @@
 
 Статический walkthrough: ATC failed + 0 critical → red; unit fail + no findings → red; ATC timeout → yellow/job ID; tool missing → yellow/gap; mixed multi-object → worst signal с breakdown; no tests → ➖ и yellow; historical paste → not executed; source-confirmed defect совпадает с ATC → один cause без потери blocker. Broad transport сохраняет scoped evidence; expected checks не притворяются выполненными.
 
-Git diff --check проходит. Markdown links/fences/frontmatter проверены: три ссылки в reporting-format — placeholders внутри fenced examples, не реальные отсутствующие зависимости.
+Git diff --check проходит. Markdown links/fences/frontmatter проверены: три ссылки в reporting-format — placeholders внутри кодовых примеров, не реальные отсутствующие зависимости.
 Ограничения: ATC, ABAP Unit, cancellation и SAP/IDE не запускались. Header/poll behavior проверен статически, не отдельным LLM-прогоном. Справочники ABAP содержат baseline patterns, target API/platform остаются предметом проверки в реальном review.
