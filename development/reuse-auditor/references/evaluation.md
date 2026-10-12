@@ -43,6 +43,11 @@ consolidation needs a domain decision and characterization tests for both paths.
 
 ## Pass criteria
 
+Also check configuration routing with a project-local Claude wrapper and an
+explicit project config elsewhere: the explicit path wins; otherwise use the
+selected local wrapper's sibling config. Missing config uses neutral defaults,
+not a global skill copy's project policy. No cross-platform scan or config edits.
+
 - A is not rejected merely because it has only two consumers.
 - B is not consolidated because of textual similarity.
 - C is not declared dead from static search alone.

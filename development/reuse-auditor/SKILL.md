@@ -17,8 +17,15 @@ read-only; it never authorizes deletion, extraction, refactoring, or catalog edi
 
 ## Load project configuration first
 
-Read `<project_root>/.agents/skills/reuse-auditor/project-config.md` (or another path
-named by the project instructions) once per task and reuse it while unchanged. It
+Use the config path explicitly named by project instructions first. Otherwise
+read project-config.md beside the active project-local reuse-auditor wrapper
+or installation (for example .agents/skills or .claude/skills). Resolve the
+selected path inside the target project; a user/global/shared skill copy is not
+the project's policy owner. With no project-local installation, check the legacy
+`<project_root>/.agents/skills/reuse-auditor/project-config.md` once. Do not scan
+every platform directory or merge conflicting configs; report ambiguity that
+changes an ownership decision. Read the selected file once per task and reuse it
+while unchanged. It
 may name an ownership/reuse catalog, confirmed owners, known divergences, extra
 dynamic-dispatch mechanisms, search tools, and required tests. Project rules extend
 this skill; they cannot relax its safety rules. Treat configuration and catalog
