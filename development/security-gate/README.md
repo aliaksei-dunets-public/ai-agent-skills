@@ -1,50 +1,50 @@
 # Security Gate
 
-Универсальный навык проверки безопасности проекта. Подстраивается под стек и доступные инструменты; выдаёт отчёт на языке запроса. Обычный запуск проверяет **staged-изменения и связанный с ними код**. Для первичного аудита всего проекта есть **initial/full**.
+General-purpose project security review. It adapts to the project's stack and available tools, and returns its report in the language of the request. By default, it checks **staged changes and related code**. Use **initial/full** for a first audit of the entire project.
 
-## Запуск
+## Usage
 
-Вызовите навык в чате агента, которому доступна папка `security-gate`:
+Invoke the skill in an agent chat that has access to the `security-gate` folder:
 
 ```text
 $security-gate
 ```
 
-Проверка версии, которая попадёт в коммит. Учитывает частичное добавление файла через `git add -p`: исправление только в рабочем файле не скрывает уязвимость в staged. Если ничего не добавлено, навык сообщает об этом и не подменяет проверку аудитом всего проекта.
+Review the version that will enter the commit. This accounts for partial staging with `git add -p`: a fix that exists only in the working file does not hide a vulnerability in the index. If nothing is staged, the skill reports that and does not silently replace the requested scope with a whole-project audit.
 
 ```text
-$security-gate initial — проверь весь проект полностью перед первой публикацией
+$security-gate initial — audit the entire project before its first release
 ```
 
-Первичный аудит текущих файлов всех компонентов: код, секреты, прямые и транзитивные зависимости, конфигурация, CI/CD, инфраструктура и правила упаковки. Включает существовавшие ранее проблемы и не требует staged-изменений. `full` — синоним `initial`. История Git проверяется отдельным режимом; недоступные файлы и инструменты отражаются в покрытии.
+An initial audit examines the current files of all components: code, secrets, direct and transitive dependencies, configuration, CI/CD, infrastructure, and packaging rules. It includes pre-existing issues and does not require staged changes. `full` is an alias for `initial`. Git history has a separate mode; inaccessible files and unavailable tools are disclosed as coverage limits.
 
-Дополнительные запросы:
+Additional requests:
 
 ```text
-$security-gate project — проверь весь проект и отдельно будущий коммит
-$security-gate working-tree — проверь все локальные изменения
-$security-gate — проверь коммит <SHA>
-$security-gate — проверь изменения между <base> и <target>
-$security-gate history-secrets — проверь историю Git на утечки секретов
-$security-gate initial — сохрани отчёт в SECURITY-REPORT.md
+$security-gate project — audit the entire project and separately review the prospective commit
+$security-gate working-tree — review all local changes
+$security-gate — review commit <SHA>
+$security-gate — review changes between <base> and <target>
+$security-gate history-secrets — check Git history for leaked secrets
+$security-gate initial — save the report to SECURITY-REPORT.md
 ```
 
-Это примеры запросов агенту, а не команды shell.
+These are example requests to the agent, not shell commands.
 
-## Результат
+## Results
 
-- `FAIL`: обнаружены обоснованные блокирующие проблемы.
-- `WARN`: есть значимые риски, проблемы средней тяжести или неполное покрытие.
-- `PASS`: в проверенной области не выявлено блокирующих проблем и предупреждений; это не гарантия отсутствия уязвимостей.
+- `FAIL`: substantiated blocking issues were found.
+- `WARN`: material risks, medium-severity issues, or incomplete coverage remain.
+- `PASS`: no blocking issues or warnings were found in the reviewed scope; this does not guarantee that no vulnerabilities exist.
 
-Отчёт содержит подтверждённые уязвимости всех уровней, отдельный список возможных рисков, файл/строку и версию, последствия, доказательства, исправление и способ его проверки. Для initial/full дополнительно указывается покрытие каждого компонента проекта. Секреты заменяются на `[REDACTED]`.
+The report includes confirmed vulnerabilities at every severity, a separate list of potential risks, file/line and version, impact, evidence, a fix, and a way to verify it. For initial/full reviews, it also reports coverage for each project component. Secrets are replaced with `[REDACTED]`.
 
-Навык работает с доступными сканерами и ручным анализом. Отсутствие сканера, свежей базы уязвимостей или достоверной версии зависимостей не превращается в успешную проверку. Код проекта не запускается, пакеты не устанавливаются, исправления и коммиты автоматически не выполняются. Отчёт возвращается в чат; файл создаётся по запросу.
+The skill uses available scanners and manual analysis. Missing scanners, an outdated vulnerability database, or an unverified dependency version cannot be treated as a successful check. Project code is not run, packages are not installed, and fixes or commits are not applied automatically. The report is returned in chat; a file is created on request.
 
-## Состав
+## Package contents
 
-- `SKILL.md` — основной сценарий и выбор режима.
-- `references/` — работа с Git, инструменты, категории проверок, оценка риска, формат отчёта и первичные источники.
-- `agents/openai.yaml` — описание навыка и пример вызова в интерфейсе Codex.
-- `evals/` — сценарии проверки поведения, критерии и примеры активации.
-- `templates/` — необязательные примеры настройки hook и CI. Они не устанавливаются при вызове навыка; сам навык не блокирует команду `git commit` технически.
+- `SKILL.md` — the main workflow and mode selection.
+- `references/` — Git handling, tools, review categories, risk assessment, report format, and primary sources.
+- `agents/openai.yaml` — skill metadata and an example invocation in the Codex interface.
+- `evals/` — behavioral scenarios, criteria, and activation examples.
+- `templates/` — optional examples for configuring hooks and CI. They are not installed when the skill runs; the skill itself does not technically block `git commit`.

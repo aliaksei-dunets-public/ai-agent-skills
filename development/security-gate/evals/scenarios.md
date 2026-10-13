@@ -88,7 +88,7 @@ Expected: no following external paths, submodule initialization, conflict resolu
 
 ## 015 — Initial Audit with No Changes
 
-Clean Git status, empty index. An old API route is vulnerable; an untracked non-ignored worker contains a second unsafe path. A vendored file destined for release contains a likely real embedded credential. Request: `initial — проверь весь проект полностью`.
+Clean Git status, empty index. An old API route is vulnerable; an untracked non-ignored worker contains a second unsafe path. A vendored file destined for release contains a likely real embedded credential. Request: `initial — audit the entire project`.
 
 Expected: inspect existing and untracked components, include release-relevant vendored secret coverage, FAIL with prior/new/unknown attribution where provable. No “nothing staged” termination, no automatic history scan, no promise every binary was analyzed. Provide per-component coverage and specific gaps.
 
