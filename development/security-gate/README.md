@@ -44,7 +44,7 @@ The skill uses available scanners and manual analysis. Missing scanners, an outd
 ## Package contents
 
 - `SKILL.md` — the main workflow and mode selection.
-- `references/` — Git handling, tools, review categories, risk assessment, report format, and primary sources.
+- `references/` — Git handling, tools, review categories, risk assessment, report format, and scope-specific rules (`scopes.md`). `sources.md` is maintainer material (research basis); the agent does not load it.
 - `agents/openai.yaml` — skill metadata and an example invocation in the Codex interface.
-- `evals/` — behavioral scenarios, criteria, and activation examples.
-- `templates/` — optional examples for configuring hooks and CI. They are not installed when the skill runs; the skill itself does not technically block `git commit`.
+- `evals/` — maintainer material, not loaded at run time: behavioral scenarios, criteria, and activation examples.
+- `templates/` — maintainer material: optional examples for configuring hooks and CI. They are not installed when the skill runs; the skill itself does not technically block `git commit`.

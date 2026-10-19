@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.2 — 2026-10-19
+
+- Merged the large-package Scope Notes bullet into step 1 and stated the
+  capability-preservation rule once (in the fix step); removed its two
+  duplicate copies. No capability or safety requirement was dropped.
+- Note: `references/platforms.md` was last checked 2026-07-14 (over 90 days);
+  its platform facts need re-verification against current platform
+  documentation. Content is unchanged.
+
 ## 2.0.1 — 2026-10-12
 
 - Clarified incremental inspection: inventory/link map first, then coherent

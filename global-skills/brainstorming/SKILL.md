@@ -63,7 +63,8 @@ reviewable in the conversation or handoff before asking for that decision. Reuse
 existing approval and accepted requirements; do not ask again for approval of
 their written copy. A reviewer's technical assessment does not substitute for a
 user decision. Do not create a design or specification file unless the user
-explicitly requests one.
+explicitly requests one; for a separately authorized review of a requested
+specification, see [the spec review reference](references/spec-document-reviewer-prompt.md).
 
 ## Implementation planning
 
@@ -78,12 +79,9 @@ unresolved assumptions instead of manufacturing exact code or commands. Keep
 architecture rationale in the design and execution steps in the plan, linked
 without copying entire documents.
 
-Use the project-defined plan location and format first. Reuse an existing plan
-instead of creating a competing copy. With no project convention, a needed
-standalone plan may use `docs/plans/YYYY-MM-DD-<topic>.md`.
-
-Self-review requirements coverage, dependencies, interface consistency, and
-checks. Use [the plan review reference](references/plan-document-reviewer-prompt.md)
+Plan location and format: see the planning reference. Self-review requirements
+coverage, dependencies, interface consistency, and checks. Use
+[the plan review reference](references/plan-document-reviewer-prompt.md)
 only for a separately authorized review. Return the plan and blocking decisions;
 execution continues only within the user's request or active workflow.
 

@@ -17,7 +17,6 @@ examples, installation and recovery steps, and links to moved files. Select
 topics from the assigned scope instead of scanning every category.
 
 Two documents can duplicate a contract without identical wording. Find the owner
-from project policy and preserve unique content before replacing a copy with a
-link. If two authoritative sources disagree and precedence is unresolved, record
+from project policy and consolidate per [documentation-model](documentation-model.md). If two authoritative sources disagree and precedence is unresolved, record
 the competing claims, evidence, effect, and decision needed. Continue unrelated
 corrections; do not conceal the conflict in a rewritten summary.

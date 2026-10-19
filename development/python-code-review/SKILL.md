@@ -64,66 +64,47 @@ inventing one. A non-Git component review does not require Git.
    Assess what tests actually protect, including failure paths, mock fidelity,
    boundary coverage, and isolation. Do not demand unrelated restructuring or
    extra tests without a concrete uncovered behavior.
-5. **Gather relevant automated evidence.** Read [tooling](references/tooling.md)
-   before choosing commands. Inspect trust and side effects first. Use focused,
+5. **Gather relevant automated evidence.** Before running any check, read
+   [tooling](references/tooling.md) (a static-only review skips it). Inspect
+   trust and side effects first. Use focused,
    supported checks in an existing environment, expanding only when scope,
    failure, or risk justifies it. Distinguish baseline failures from regressions
    and scanner candidates from demonstrated defects. Record unrun checks.
 6. **Sweep for omissions.** After semantic analysis, consider the applicable
-   dimensions below. Search headings in [python-review](references/python-review.md)
+   dimensions: behavior, local design, architecture, security, and operations
+   (coverage means considered, not that each produced a finding). Search headings in [python-review](references/python-review.md)
    and read only relevant sections for actual Python versions and frameworks.
    Do not invent findings to fill categories or ignore valid issues absent
    from a reference.
-7. **Challenge and reconcile.** Apply the independent-review policy below when
+7. **Challenge and reconcile.** Apply the independent-review rule below when
    relevant. Verify all feedback against the target, merge common root causes,
    and reject unreachable, disproved, or preference-only findings.
-8. **Report.** Use the compact contract in [review-report](templates/review-report.md).
-   Return evidence, material findings, verification, and limits. Give a verdict
+8. **Report.** Use the default finding format below; load
+   [review-report](templates/review-report.md) only for a detailed or
+   project-audit report. Return evidence, material findings, verification, and
+   limits. Give a verdict
    when requested or expected for a merge review; never infer user acceptance
    or claim execution from a static trace.
 
-## Coverage dimensions
+## Independent review
 
-| Dimension | Relevant questions |
-| --- | --- |
-| Behavior | Requirements, invariants, boundary cases, failures, compatibility |
-| Local design | Cohesion, understandable control flow, duplication, hidden effects |
-| Architecture | Responsibility, dependencies, contracts, change propagation |
-| Security | Trust, authorization, sensitive data, injection, supply-chain effects |
-| Operations | Workload, state/resources, timeouts, concurrency, recovery, diagnosis |
-
-Coverage means the dimension was considered where applicable, not that it
-produced a finding. For project audits, inventory components and prioritize
-entry points, core workflows, shared/high fan-in boundaries, stateful or
-irreversible operations, external integrations, and test infrastructure.
-Report deeply inspected, sampled, and uninspected areas. Do not call sampling
-complete repository coverage.
-
-## Independent-review policy
-
-Use a separate reviewer when required by the user/project, or when authorized
-delegation adds meaningful confidence: a consequential release, migration,
-security boundary, public contract, concurrency change, or serious candidate
-finding may warrant it. Do not automatically spawn agents for every review or
-treat tool availability as permission.
-
-For a permitted separate review, read [independent-reviewer](reviewers/independent-reviewer.md).
-Provide bounded read-only scope, exact snapshots, requirements, relevant source
-paths, sanitized observed evidence, and limits. Withhold primary findings and
-persuasive conclusions; require a compact result and no nested delegation.
-The primary reviewer retains integration and verdict responsibility.
-
-If separate execution is unavailable or unauthorized, perform a proportionate
-challenge pass from a different entry point or test, seek counterevidence, and
-state that it is self-review. If the project requires independent review for
-acceptance and it cannot be completed, report the unmet gate; a self-review
-does not satisfy it.
+Use a separate reviewer when the user or the project requires it, or when
+authorized delegation would add meaningful confidence (release, migration,
+security boundary, public contract, concurrency, serious candidate finding);
+then read [independent-reviewer](reviewers/independent-reviewer.md). If you are
+already the assigned reviewer, do not delegate or start further reviewers.
 
 ## Findings and completion
 
-For each actionable finding provide severity, exact location or boundary,
-trigger, evidence, causal impact, minimal correction, and confidence. Keep
-unverified concerns separate from confirmed findings and suggestions.
+Default finding format, three lines per actionable finding:
+
+```text
+[Severity] location or boundary (snapshot)
+Trigger, evidence, and causal impact in one sentence; confidence.
+Minimal correction or acceptance condition.
+```
+
+Keep unverified concerns separate from confirmed findings and suggestions.
 
 - **Critical:** credible compromise, data loss, dangerous financial effect,
   systemic outage, or fundamentally broken core behavior.

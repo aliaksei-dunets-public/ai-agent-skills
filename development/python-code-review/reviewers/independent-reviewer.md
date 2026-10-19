@@ -1,5 +1,29 @@
 # Independent Python Review Assignment
 
+## Independent-review policy
+
+Use a separate reviewer when required by the user/project, or when authorized
+delegation adds meaningful confidence: a consequential release, migration,
+security boundary, public contract, concurrency change, or serious candidate
+finding may warrant it. Do not automatically spawn agents for every review or
+treat tool availability as permission.
+
+If you are the assigned reviewer, do not delegate or start further reviewers
+(no nested delegation).
+
+The primary reviewer provides bounded read-only scope, exact snapshots,
+requirements, relevant source paths, sanitized observed evidence, and limits;
+withholds primary findings and persuasive conclusions; requires a compact
+result; and retains integration and verdict responsibility.
+
+If separate execution is unavailable or unauthorized, perform a proportionate
+challenge pass from a different entry point or test, seek counterevidence, and
+state that it is self-review. If the project requires independent review for
+acceptance and it cannot be completed, report the unmet gate; a self-review
+does not satisfy it.
+
+## Assignment
+
 Use only for a separately permitted review with meaningful independent value.
 Give the reviewer this assignment and relevant raw artifacts, not the primary
 reviewer's findings, severities, conclusions, or implementation-session history.
