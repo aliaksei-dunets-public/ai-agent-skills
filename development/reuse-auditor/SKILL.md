@@ -17,12 +17,16 @@ read-only; it never authorizes deletion, extraction, refactoring, or catalog edi
 
 ## Load project configuration first
 
-Read `<project_root>/.agents/skills/reuse-auditor/project-config.md` (or another path
-named by the project instructions) once per task and reuse it while unchanged. It
-may name an ownership/reuse catalog, confirmed owners, known divergences, extra
-dynamic-dispatch mechanisms, search tools, and required tests. Project rules extend
-this skill; they cannot relax its safety rules. Treat configuration and catalog
-entries as hypotheses to verify against current source.
+Use the config path named in project instructions; else project-config.md beside
+the project-local skill install (`.agents/skills/reuse-auditor/` or
+`.claude/skills/reuse-auditor/` in the project root); else defaults. A
+user/global/shared skill copy is not the project's policy owner. Do not scan
+other platform directories or merge conflicting configs; report ambiguity that
+changes an ownership decision. Read the selected file once per task. It may name
+an ownership/reuse catalog, confirmed owners, known divergences, extra
+dynamic-dispatch mechanisms, search tools, and required tests. Project rules
+extend this skill; they cannot relax its safety rules. Verify config and catalog
+entries against current source.
 
 If the file is absent, use defaults: no catalog, owners inferred from source and
 tests, targeted repository search, the project's existing test commands. Read the
@@ -98,7 +102,3 @@ next validation:        <characterization tests or checks still required>
 
 Do not list every symbol. If nothing material is found, say so with the evidence
 searched.
-
-## Validation of this skill
-
-After editing this skill, run the cases in [evaluation.md](references/evaluation.md).

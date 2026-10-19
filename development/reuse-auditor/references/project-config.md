@@ -4,9 +4,12 @@ This bundled file holds neutral defaults and is the template for project
 customization. Do not add project-specific content here: the skill clone is shared
 by many projects.
 
-To customize a project, copy this file to
-`<project_root>/.agents/skills/reuse-auditor/project-config.md` (or a path named in
-the project instructions) and fill in only the sections that apply. The project
+To customize a project, copy this file to the config path named in project
+instructions or beside the selected project-local skill wrapper/installation.
+The legacy Codex path is `<project_root>/.agents/skills/reuse-auditor/project-config.md`;
+a selected Claude installation may use `.claude/skills/reuse-auditor/project-config.md`.
+Use one canonical project owner as described in SKILL.md and fill only applicable
+sections. Do not store target-project policy in a global/shared skill copy. The project
 copy is owned by that project and survives skill updates. Omitted sections fall
 back to the defaults below.
 

@@ -4,7 +4,8 @@ description: >
   Create, improve, audit, or explore prompts for LLMs. Use when the requested
   deliverable is a prompt, prompt critique, or reusable prompt template. Preserve
   the user's intent and target capabilities; do not perform the domain task
-  described inside a prompt unless separately requested.
+  described inside a prompt unless separately requested. For auditing a package
+  of skills or instructions use optimizer.
 ---
 
 # Prompt Architect
@@ -51,7 +52,7 @@ execution, or subagents. Do not ask for a platform if a portable result suffices
   It offers optional techniques, not a second workflow or a mandatory template.
 - Use only sections and techniques needed for the requested outcome. Avoid
   adding architecture discussions, XML, multiple variants, or negative
-  constraints solely because a domain label suggests them.
+  constraints solely because they seem conventional.
 - Preserve necessary user-provided URLs, file paths, identifiers, and citations.
   Add external references when requested or needed for grounding; omit unrelated
   links. For a reusable template with no fixed source, label its source input
@@ -83,8 +84,7 @@ prompt in a fenced Markdown block for copying, with assumptions and material
 change notes outside it. An audit or exploration response does not require a
 prompt block. If the user asks for only the prompt, omit the surrounding commentary.
 
-Do not print internal intent/domain labels, a calibration score, or a follow-up
-offer by default. For iterative revisions, preserve accepted requirements,
+Do not print a calibration score or a follow-up offer by default. For iterative revisions, preserve accepted requirements,
 label versions when useful, and state only the material differences. Evaluate
 actual target-model outputs when supplied; do not claim effectiveness from
 prompt wording alone.

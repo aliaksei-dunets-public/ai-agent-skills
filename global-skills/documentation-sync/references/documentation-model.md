@@ -28,9 +28,5 @@ Preserve unique information when consolidating. Do not erase caveats, decisions,
 or historical context simply to shorten a document. Move content only within
 authorized scope, with an incoming-link map and the project's archive policy.
 
-## Design and plan
-
-Use the project's existing plan location and format. A design explains what is
-intended, why, and what decisions have been made; a plan describes execution
-steps, dependencies, and checks. Link them without copying the full sequence
-into a second owner. No specific planner or external service is required.
+Use the project's existing plan location and format; no specific planner or
+external service is required.

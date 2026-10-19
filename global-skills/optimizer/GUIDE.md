@@ -47,6 +47,11 @@ Optimizer keeps the author's intent, capabilities, language, and safety
 requirements, changes only what its findings justify, and does not claim
 measured improvements it did not measure.
 
+For large packages, it inventories paths and inspects coherent workflow batches.
+Reports state inspected/deferred/unreadable areas; a partial batch is not a
+complete audit. Exhaustive requests continue across batches, and fixes include
+affected incoming links and governing documents without loading unrelated files.
+
 ## Installation
 
 Copy the `optimizer` folder into the skill directory of your platform, for

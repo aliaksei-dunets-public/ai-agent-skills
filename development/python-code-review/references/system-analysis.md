@@ -190,7 +190,10 @@ triggering scenario. Unknowns belong in residual risk, not disguised as facts.
 
 ## 13. Project-Audit Sampling
 
-When exhaustive reading is impractical, sample intentionally:
+Inventory components first and prioritize entry points, core workflows,
+shared/high fan-in boundaries, stateful or irreversible operations, external
+integrations, and test infrastructure. When exhaustive reading is impractical,
+sample intentionally:
 
 - one or more primary end-to-end workflows;
 - one failure-heavy workflow;
@@ -200,8 +203,8 @@ When exhaustive reading is impractical, sample intentionally:
 - persistence and external integration boundaries;
 - test infrastructure and CI configuration.
 
-Record inspected, sampled, and uninspected areas. Generalize only when repeated
-evidence supports it.
+Report deeply inspected, sampled, and uninspected areas. Do not call sampling
+complete repository coverage. Generalize only when repeated evidence supports it.
 
 ## 14. Open-Ended Review Prompts
 

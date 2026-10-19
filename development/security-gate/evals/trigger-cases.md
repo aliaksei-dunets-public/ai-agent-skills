@@ -3,9 +3,9 @@
 ## Should Trigger
 
 - `$security-gate`
-- Проверь staged-изменения и связанный код перед коммитом.
+- Review staged changes and related code before committing.
 - Security check before I publish these changes.
-- `$security-gate initial` — проверь весь проект полностью.
+- `$security-gate initial` — audit the entire project.
 - Perform an initial security audit of this non-Git project folder.
 - Review this PR for auth, injection, dependency, and CI risks.
 - Audit commit `abc123` for vulnerabilities and leaked credentials.

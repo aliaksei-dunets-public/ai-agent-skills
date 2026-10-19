@@ -48,11 +48,11 @@ project's policy and authority to change its structure.
    project rules and evidence do not settle a material conflict, record it and
    ask the owner; do not choose silently.
 5. **Make minimal consistent changes.** Update affected claims, examples, commands,
-   indexes, and incoming links together. Consolidate duplicates only after
-   preserving their unique information. Keep design rationale, operational
+   indexes, and incoming links together. Consolidate duplicates per
+   [documentation-model](references/documentation-model.md). Keep design rationale, operational
    plans, current status, results, and archives in their existing owners.
-   Read [documentation-model](references/documentation-model.md) when boundaries
-   are unclear or consolidation is needed.
+   Read documentation-model when boundaries are unclear or consolidation is
+   needed.
 6. **Validate the affected scope.** Check links and anchors, examples against
    current interfaces, terminology, formatting, and project-required checks.
    Read [quality-checks](references/quality-checks.md) for the relevant checks.
