@@ -18,6 +18,9 @@ For a single standalone prompt, use the `prompter` skill instead.
   contracts.
 - **Documentation:** README/guide, changelog, and version reflect the current
   behavior.
+- **Fit and footprint:** defaults that match the workflows calling the package,
+  rules not hidden in conditionally loaded files, and a load map of what a
+  typical and a worst-case run actually reads.
 
 The full list is in `references/checklist.md`; the rules used when rewriting
 are in `references/best-practices.md`; platform notes (Codex, Claude Code,

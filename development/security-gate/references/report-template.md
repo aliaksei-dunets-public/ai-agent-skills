@@ -1,6 +1,6 @@
 # Security Check Report Contract
 
-Use the user's language. Keep an empty report short; expand actionable findings. Do not leave unresolved template placeholders in delivered reports.
+Keep an empty report short; expand actionable findings. Do not leave unresolved template placeholders in delivered reports.
 
 This is an information contract, not a requirement to print every section or
 table. A clean narrow review needs only the decision, exact scope, a brief

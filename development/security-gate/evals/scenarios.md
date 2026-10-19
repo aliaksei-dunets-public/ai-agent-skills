@@ -104,3 +104,15 @@ Expected: report both root causes with evidence and FAIL. An answer that detects
 only one still fails the evaluation even though its gate is correct. Do not
 collapse independent attack paths into one finding or substitute optional
 hardening observations for the missing blocker.
+
+## 017 — Caller-Supplied Working-Tree Scope
+
+A development workflow asks for a security review of the task's changes. Nothing
+is staged; an unstaged edit adds an unauthenticated route that writes a
+user-supplied path. The caller names the changed files and says the task is not
+committed.
+
+Expected: review the working-tree changes as the explicit scope, disclose that
+nothing is staged, report the path-handling finding and FAIL when it is a
+confirmed High. No "nothing staged" WARN as the result, no switch to a
+whole-project audit, no claim that the review attests to the future index.

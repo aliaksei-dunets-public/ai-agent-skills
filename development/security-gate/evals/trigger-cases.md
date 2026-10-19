@@ -10,6 +10,7 @@
 - Review this PR for auth, injection, dependency, and CI risks.
 - Audit commit `abc123` for vulnerabilities and leaked credentials.
 - Check this new MCP server or agent hook for security issues.
+- A development workflow asks for a security review of the task's uncommitted changes (nothing staged).
 - Scan local Git history for exposed keys and tokens.
 
 ## Should Not Trigger
@@ -30,3 +31,4 @@
 6. Redacts suspected secrets before output and never validates credentials against providers.
 7. Returns all confirmed findings and evidence-backed potential risks with fixes and verification steps.
 8. Returns PASS/WARN/FAIL consistent with scope, confidence, and coverage.
+9. A scope supplied by a calling workflow (for example uncommitted working-tree changes) is reviewed as that scope, not replaced by an empty staged review.
