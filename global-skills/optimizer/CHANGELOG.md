@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.1.0 — 2026-10-19
+
+- Found while auditing `security-gate` (defaults wrong for a calling workflow, a
+  gate rule living only in a conditionally loaded file, size judged without
+  measuring what a run loads, consumer documentation out of step): added a load
+  map (byte sizes, when each file enters context) and consumer discovery to
+  step 1, a restated-rule phrase search to step 2, and the *caller mismatch* and
+  conditional-only-rule items to step 3.
+- Checklist items for caller defaults, pointer-condition coverage and
+  typical/worst-case run load; the final report includes the load map when
+  context cost was in question; consumer-side mismatches are reported to their
+  owner unless in scope. No capability or safety requirement was removed.
+
 ## 2.0.2 — 2026-10-19
 
 - Merged the large-package Scope Notes bullet into step 1 and stated the

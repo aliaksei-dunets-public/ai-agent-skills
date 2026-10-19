@@ -41,7 +41,13 @@ Find the entry point and read it fully. Establish the package's purpose,
 intended triggers, users, inputs and outputs, tools, subagents, target
 platform(s), and any constraints the user gave. Inventory paths and build a
 link map without loading every file's contents: entry-point routes, incoming
-links, configuration owners, examples, and unlinked files.
+links, configuration owners, examples, and unlinked files. Add a load map: the
+byte size of each file and when it enters context (always, on a stated
+pointer condition, or never in a run because it is unlinked or maintainer-only),
+so the typical and worst-case load per run is known before judging "too large".
+Search the surrounding repository for consumers that bind, trigger or describe
+the package (registries, workflow steps, documentation) and keep them in scope
+for consistency checks.
 
 Read the files needed for the selected scope before judging their content.
 Start with the entry point, directly linked resources and governing docs;
@@ -69,7 +75,9 @@ Use search and file listing rather than memory:
 - frontmatter: required fields present, `name` matches the folder, the
   `description` states what the skill does and when to use it;
 - broken Markdown: unbalanced code fences, malformed tables, empty sections;
-- examples that no longer match the rules they illustrate.
+- examples that no longer match the rules they illustrate;
+- restated rules: search a distinctive phrase of each hard rule across the
+  package and its consumers, and list every copy that is found.
 
 ### 3. Audit the content
 
@@ -83,7 +91,11 @@ relevant to this package. Look especially for:
 - **ambiguity** — vague verbs ("handle", "be careful"), undefined terms,
   missing stop conditions, rules without a decision criterion;
 - **misplaced content** — long procedures in always-on files, detail that
-  belongs in a reference, references loaded unconditionally;
+  belongs in a reference, references loaded unconditionally, or a rule needed
+  on every run that lives only in a conditionally loaded reference;
+- **caller mismatch** — defaults (scope, mode, output) that differ from what a
+  calling workflow, graph step or skill supplies or expects, or a consumer
+  that describes the package differently from its entry point;
 - **weak activation** — descriptions too broad, too narrow, or overlapping with
   another skill;
 - **missing controls** — no failure handling, no boundaries for write or
@@ -122,6 +134,9 @@ Apply the fixes using [the writing guide](references/best-practices.md):
    for some tasks, and add a clear pointer saying when to load it.
 6. Update every affected document in the same pass: guide/README, examples,
    changelog, version, and anything that names a changed file or option.
+   Consumers outside the package (registries, workflow definitions, other
+   documentation) are edited only when they are in the requested scope;
+   otherwise report their mismatch and the owner.
 
 Preserve the author's intent, capabilities, language, terminology, and style;
 never trade away a capability, safety control, or required evidence to save
@@ -148,6 +163,8 @@ for); keep paths, identifiers, and quotations unchanged. Include only:
 3. **Questions** — only open decisions; omit when none;
 4. **Checks** — what was verified and material coverage limits; identify partial
    batches/deferred files and distinguish static checks from runtime evidence.
+   When size or context cost was in question, include the load map (typical and
+   worst-case bytes per run, unlinked files counted separately).
 
 Do not claim token savings or behavioral improvements that were not measured;
 describe the change instead (for example, "removed the duplicated 40-line

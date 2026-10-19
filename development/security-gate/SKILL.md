@@ -39,8 +39,12 @@ publish code, or certify security.
 
 ## Choose the exact scope
 
-Honor explicit scope. With no scope given (bare invocation, pre-commit check),
-use staged and announce the default without routine setup questions.
+Honor explicit scope. A scope named by the caller counts as explicit: a user
+request, or a workflow step that hands over the changes under review (for
+example the working tree of a task not yet staged or committed) is reviewed as
+that scope (working-tree, range, commit), never replaced by staged. With no scope
+given (bare invocation, pre-commit check), use staged and announce the default
+without routine setup questions.
 
 | Mode | Snapshot and attribution |
 | --- | --- |
@@ -56,9 +60,10 @@ For initial/full ("initial audit", "check the entire project", even with no
 changes) or project scope, read [scopes](references/scopes.md) before inventory.
 
 Read [git-commands](references/git-commands.md) only for staged, range, or commit
-snapshots. Never substitute working files for staged or historical content. A
-fixed working copy cannot clear vulnerable index content. Empty staged scope is WARN with no
-automatic expansion; deletions and unborn HEAD are not inherently empty.
+snapshots. Never substitute working files for staged or historical content: a fixed
+working copy or an unstaged fix cannot clear vulnerable index content or the
+staged gate. Empty staged scope is WARN with no automatic expansion; deletions
+and unborn HEAD are not inherently empty.
 
 A Git-only scope unavailable without Git is WARN. Inspect related context in the same snapshot; unrelated incidental findings
 stay outside a narrow gate. Do not silently scan history or follow external paths.
@@ -86,16 +91,17 @@ stay outside a narrow gate. Do not silently scan history or follow external path
    and affected range, runtime/build/dev use, reachability, and verified fix
    availability. An affected package is not proof of application exploitability.
    Do not invent CVEs, fixed versions, or omit applicable Medium/Low findings.
-6. Recheck snapshot identity before reporting (the working-copy-versus-index rule
-   above applies). Resolve stale evidence from changed files/index or disclose
+6. Recheck snapshot identity before reporting. Resolve stale evidence from changed files/index or disclose
    the incomplete scope rather than issuing a clean result from an earlier version.
 
 ## Gate and report
 
-Keep severity, confidence, and reachability distinct. Missing material coverage,
-failed scans, or an empty staged review cannot yield PASS. Pre-existing project
-risks cannot disappear behind a clean diff, and an unstaged fix cannot clear the
-staged gate.
+Keep severity, confidence, and reachability distinct. PASS needs adequate
+documented coverage of every applicable category (N/A only with a concrete
+reason); manual review does not replace missing automated SAST or dependency
+coverage. Missing material coverage, failed scans, or an empty staged review
+cannot yield PASS, and pre-existing project risks cannot disappear behind a
+clean diff.
 
 Minimal report contract (clean narrow review):
 
@@ -107,8 +113,9 @@ Minimal report contract (clean narrow review):
 5. Next action: minimal fixes, safe verification, or required follow-up.
 
 Read [report-template](references/report-template.md) for project, initial, or
-full scope, or when findings exist. Read [severity](references/severity.md) only
-when a finding is rated; it is the canonical severity/gate policy.
+full scope, or when findings exist. Read [severity](references/severity.md) when a
+finding is rated or when WARN versus FAIL is uncertain; it is the canonical
+severity/gate policy.
 
 Return the report in the user's language, in chat unless a file was requested.
 Include all confirmed severities, concrete potential risks, source/snapshot,
