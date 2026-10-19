@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-from conftest import SCRIPT, SKILL_DIR
+from helpers import CLEAN_SCRIPT as SCRIPT, TEMP_FILES as SKILL_DIR
 
 SKILL = SKILL_DIR / "SKILL.md"
 
@@ -46,3 +46,8 @@ def test_script_only_deletes_inside_tmp():
     assert len(removals) == 2, "only the file and empty-folder removals are allowed"
     assert all("-LiteralPath" in r for r in removals), "never use wildcard-expanding -Path"
     assert "-Recurse" not in script
+
+
+def test_skill_folder_contains_no_tests():
+    """Tests live in the repository-level tests/ folder, never next to the skill."""
+    assert not (SKILL_DIR / "tests").exists()

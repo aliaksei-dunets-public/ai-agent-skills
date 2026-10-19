@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-from conftest import SKILL_DIR, TEMPLATE
+from helpers import PROJECT_INIT as SKILL_DIR, TEMPLATE
 
 SKILL = SKILL_DIR / "SKILL.md"
 
@@ -48,7 +48,7 @@ def test_template_links_match_what_the_script_creates():
     """The template links must point to paths that init_project.ps1 creates."""
     script = (SKILL_DIR / "scripts/init_project.ps1").read_text(encoding="utf-8")
     assert 'Ensure-Dir "docs"' in script
-    assert 'Ensure-Link ".agents/skills/temp-files"' in script
+    assert 'Ensure-Stub ".agents/skills/temp-files"' in script
 
 
 def test_script_never_contains_destructive_commands():
@@ -72,3 +72,8 @@ def test_skill_lists_all_template_sections():
     assert sections, "template has no sections"
     for name in sections:
         assert name in skill, f"SKILL.md step 3 must mention the template section '{name}'"
+
+
+def test_skill_folder_contains_no_tests():
+    """Tests live in the repository-level tests/ folder, never next to the skill."""
+    assert not (SKILL_DIR / "tests").exists()

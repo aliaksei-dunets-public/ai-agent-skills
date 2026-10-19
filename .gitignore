@@ -2,3 +2,6 @@ global-skills/task-manager/scripts/
 .env
 .ai_task_manager/tasks/
 .ai_task_manager/task_numbers.db
+.tmp/
+.agents/skills/temp-files/
+.claude/skills/temp-files/

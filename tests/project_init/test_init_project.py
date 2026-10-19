@@ -2,21 +2,18 @@
 modifies or deletes anything that already exists."""
 
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 
-from conftest import TEMP_FILES, TEMPLATE, run_init, snapshot, statuses
+from helpers import TEMP_FILES, TEMPLATE, make_junction, run_init, snapshot, statuses
 
 pytestmark = pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell only")
 
 EXISTING_AGENTS = "# My rules\n\nWrite docs in Russian.\nDo not touch the DB.\n"
-
-
-def make_junction(link: Path, target: Path) -> None:
-    subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(target)], check=True, capture_output=True)
 
 
 # --- fresh project ---------------------------------------------------------
@@ -32,25 +29,35 @@ def test_fresh_project_gets_everything(root: Path):
     assert (root / ".gitignore").read_text() == ".tmp/\n"
     assert (root / "docs/README.md").is_file()
     assert (root / "AGENTS.md").read_text(encoding="utf-8") == TEMPLATE.read_text(encoding="utf-8")
-    link = root / ".agents/skills/temp-files"
-    assert link.is_junction()
-    assert (link / "SKILL.md").is_file()
+    stub = root / ".agents/skills/temp-files"
+    assert not stub.is_junction()
+    assert (stub / "SKILL.md").is_file()
 
 
 def test_claude_flag_adds_claude_artifacts(root: Path):
     result = run_init(root, "-Claude")
     assert result.returncode == 0, result.stdout
     assert (root / ".claude").is_dir()
-    assert (root / "CLAUDE.md").read_text() == "@AGENTS.md\n"
-    assert (root / ".claude/skills/temp-files").is_junction()
+    assert not (root / "CLAUDE.md").exists(), "AGENTS.md is the single instruction file"
     assert (root / ".claude/skills/temp-files/SKILL.md").is_file()
 
 
-def test_link_points_to_original_not_a_copy(root: Path):
-    run_init(root)
-    link = root / ".agents/skills/temp-files"
-    assert link.is_junction()
-    assert os.path.samefile(link / "SKILL.md", TEMP_FILES / "SKILL.md")
+def frontmatter_of(path: Path) -> str:
+    text = "\n".join(path.read_text(encoding="utf-8").splitlines())
+    return re.match(r"---\n.*?\n---", text, re.S).group(0)
+
+
+@pytest.mark.parametrize("rel", [".agents/skills/temp-files", ".claude/skills/temp-files"])
+def test_stub_has_original_frontmatter_and_pointer_only(root: Path, rel: str):
+    run_init(root, "-Claude")
+    stub = root / rel
+    text = (stub / "SKILL.md").read_text(encoding="utf-8")
+    assert frontmatter_of(stub / "SKILL.md") == frontmatter_of(TEMP_FILES / "SKILL.md")
+    assert str(TEMP_FILES / "SKILL.md") in text, "stub must point to the original SKILL.md"
+    assert [p.name for p in stub.iterdir()] == ["SKILL.md"], "nothing else is copied"
+    assert len(text) < 1200, "a stub carries no skill body"
+    body = text.split("---", 2)[2]
+    assert "clean_tmp.ps1" not in body and "## " not in body, "original rules are not duplicated"
 
 
 def test_second_run_is_idempotent(root: Path):
@@ -84,18 +91,13 @@ def test_existing_agents_md_bytes_are_preserved_exactly(root: Path):
     assert (root / "AGENTS.md").read_bytes() == raw
 
 
-def test_existing_claude_md_without_import_is_flagged_not_changed(root: Path):
+def test_claude_md_is_never_created_or_modified(root: Path):
+    run_init(root, "-Claude")
+    assert not (root / "CLAUDE.md").exists()
     (root / "CLAUDE.md").write_text("my claude rules\n", encoding="utf-8")
     result = run_init(root, "-Claude")
     assert (root / "CLAUDE.md").read_text(encoding="utf-8") == "my claude rules\n"
-    assert statuses(result)["CLAUDE.md"] == "needs-review"
-
-
-def test_existing_claude_md_with_import_is_skipped(root: Path):
-    (root / "CLAUDE.md").write_text("intro\n@AGENTS.md\nmore\n", encoding="utf-8")
-    result = run_init(root, "-Claude")
-    assert (root / "CLAUDE.md").read_text(encoding="utf-8") == "intro\n@AGENTS.md\nmore\n"
-    assert statuses(result)["CLAUDE.md"] == "skipped"
+    assert "CLAUDE.md" not in statuses(result)
 
 
 def test_other_tools_instruction_files_are_untouched(root: Path):
@@ -156,19 +158,35 @@ def test_gitignore_bom_is_preserved(root: Path):
     assert (root / ".gitignore").read_bytes().startswith(raw)
 
 
-# --- links -----------------------------------------------------------------
+# --- stubs -----------------------------------------------------------------
 
-def test_plain_copy_of_skill_is_left_untouched(root: Path):
-    copy = root / ".agents/skills/temp-files"
-    copy.mkdir(parents=True)
-    (copy / "SKILL.md").write_text("my modified copy\n")
+def test_existing_skill_folder_is_left_untouched(root: Path):
+    mine = root / ".agents/skills/temp-files"
+    mine.mkdir(parents=True)
+    (mine / "SKILL.md").write_text("my modified copy" + chr(10))
     result = run_init(root)
-    assert (copy / "SKILL.md").read_text() == "my modified copy\n"
-    assert not copy.is_junction()
+    assert (mine / "SKILL.md").read_text() == "my modified copy" + chr(10)
+    assert statuses(result)[".agents/skills/temp-files"] == "skipped"
+
+
+def test_existing_folder_without_skill_md_only_gets_the_stub(root: Path):
+    mine = root / ".agents/skills/temp-files"
+    mine.mkdir(parents=True)
+    (mine / "notes.txt").write_text("keep me")
+    run_init(root)
+    assert (mine / "notes.txt").read_text() == "keep me"
+    assert (mine / "SKILL.md").is_file()
+
+
+def test_legacy_junction_is_reported_not_replaced(root: Path):
+    (root / ".agents/skills").mkdir(parents=True)
+    make_junction(root / ".agents/skills/temp-files", TEMP_FILES)
+    result = run_init(root)
     assert statuses(result)[".agents/skills/temp-files"] == "needs-review"
+    assert (root / ".agents/skills/temp-files").is_junction()
 
 
-def test_dangling_link_is_reported_not_replaced(root: Path, tmp_path: Path):
+def test_dangling_junction_is_reported_not_replaced(root: Path, tmp_path: Path):
     gone = tmp_path / "gone"
     gone.mkdir()
     (root / ".agents/skills").mkdir(parents=True)
@@ -179,19 +197,12 @@ def test_dangling_link_is_reported_not_replaced(root: Path, tmp_path: Path):
     assert (root / ".agents/skills/temp-files").is_junction()
 
 
-def test_healthy_existing_link_is_skipped(root: Path):
-    (root / ".agents/skills").mkdir(parents=True)
-    make_junction(root / ".agents/skills/temp-files", TEMP_FILES)
-    result = run_init(root)
-    assert statuses(result)[".agents/skills/temp-files"] == "skipped"
-
-
 def test_missing_temp_files_skill_fails_but_rest_is_still_done(root: Path, tmp_path: Path):
     result = run_init(root, temp_files=tmp_path / "does-not-exist")
     assert result.returncode == 1
     assert statuses(result)[".agents/skills/temp-files"] == "failed"
     assert (root / "AGENTS.md").is_file() and (root / ".tmp").is_dir()
-    assert not (root / ".agents/skills/temp-files").exists()
+    assert not (root / ".agents/skills/temp-files").exists(), "no stub without the original"
 
 
 def test_default_temp_files_path_resolves_next_to_the_skill(root: Path):

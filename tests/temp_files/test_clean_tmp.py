@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import make_file, make_junction, run_clean
+from helpers import make_file, make_junction, run_clean
 
 pytestmark = pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell only")
 

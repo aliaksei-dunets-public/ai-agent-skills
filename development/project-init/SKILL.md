@@ -4,7 +4,7 @@ description: >
   Onboard a new project folder on Windows: local git repository, AGENTS.md
   (existing agent instructions are audited and normalized to the standard),
   docs/, .agents/, optional .claude/, .tmp/ with .gitignore, the temp-files
-  skill linked to its original, and optional onboarding of ai-graph-guide and
+  skill as a stub pointing to its original, and optional onboarding of ai-graph-guide and
   ai-task-manager. Safe to rerun: existing artifacts are skipped, instructions
   are changed only after a confirmed diff. Use when setting up an empty or new
   project folder. Not for updating the graph core or reinstalling components.
@@ -38,25 +38,29 @@ Run [init_project.ps1](scripts/init_project.ps1) once with the decisions from
 step 1. It creates only what is missing and never modifies or deletes anything:
 git repository (`-GitInit`), `docs/` with `README.md`, `.agents/skills/`,
 `.tmp/` and its `.gitignore` line (append only), `AGENTS.md` from
-[the template](assets/AGENTS.template.md), and the junction
-`.agents/skills/temp-files` to `<temp-files>`. With `-Claude` it also creates
-`.claude/`, `CLAUDE.md` (`@AGENTS.md`) and `.claude/skills/temp-files`.
+[the template](assets/AGENTS.template.md), and the stub
+`.agents/skills/temp-files/SKILL.md`. With `-Claude` it also creates
+`.claude/` and `.claude/skills/temp-files`. It never creates `CLAUDE.md`:
+`AGENTS.md` is the single instruction file.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File <skill_path>/scripts/init_project.ps1 -ProjectRoot <root> -TempFilesPath <temp-files> [-GitInit] [-Claude] [-DryRun]
 ```
 
-Pass `-TempFilesPath` explicitly when this skill is reached through a link. Run
+The stub holds only the original skill's frontmatter (so the agent can trigger
+it) and the path to the original `<temp-files>/SKILL.md`; the skill itself is
+never copied or linked as a folder. Pass `-TempFilesPath` explicitly when this
+skill is reached through a link. Run
 with `-DryRun` first when the folder is not empty. Do not recreate by hand what
 the script does.
 
 Read its report, one line per item: `created`, `skipped`, `would-create`,
 `needs-review` or `failed` (exit code 1). A `failed` item does not stop the
 others; report it. `needs-review` means an existing artifact was left untouched
-and needs your judgment: an existing `AGENTS.md` or `CLAUDE.md` (step 3), a plain
-copy of the skill instead of a link, or a dangling link (offer to recreate it
-after the user agrees; never delete it yourself). Junctions are machine-local:
-rerun on another machine.
+and needs your judgment: an existing `AGENTS.md` (step 3), or a
+link in place of the stub (an older junction; offer to replace it with a stub after
+the user agrees, never delete it yourself). The stub contains this machine's
+path to the original: rerun the skill on another machine.
 
 ## 3. Agent instructions
 
