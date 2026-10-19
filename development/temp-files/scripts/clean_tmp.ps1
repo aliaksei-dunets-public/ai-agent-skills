@@ -61,6 +61,17 @@ function Test-InsideTmp([string]$Path) {
     return $Path.StartsWith($TmpPrefix, [System.StringComparison]::OrdinalIgnoreCase)
 }
 
+# Re-checked right before every deletion: the item and every parent below .tmp must
+# still exist and be a plain file/folder (not swapped for a link after the walk).
+function Test-PlainPath([string]$Path) {
+    $current = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    while ($current -and $current.FullName.TrimEnd([char]92) -ne $TmpItem.FullName.TrimEnd([char]92)) {
+        if ($current.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { return $false }
+        $current = if ($current -is [System.IO.DirectoryInfo]) { $current.Parent } else { $current.Directory }
+    }
+    return [bool]$current
+}
+
 function Get-EffectiveDate([System.IO.FileInfo]$File) {
     $date = $File.LastWriteTime
     if ($File.Name -match '^(\d{4})\.(\d{2})\.(\d{2})_') {
@@ -108,6 +119,11 @@ foreach ($file in $files) {
         continue
     }
     try {
+        if (-not (Test-PlainPath $file.FullName)) {
+            Write-Host " [SKIPPED] $($file.FullName): changed during the run"
+            $skipped++
+            continue
+        }
         $size = $file.Length
         Remove-Item -LiteralPath $file.FullName -Force
         Write-Host " [REMOVED] $($file.FullName)"
@@ -125,7 +141,7 @@ if (-not $DryRun) {
         Sort-Object { $_.FullName.Length } -Descending
     foreach ($dir in $nested) {
         if (-not (Test-InsideTmp $dir.FullName)) { continue }
-        if (-not (Test-Path -LiteralPath $dir.FullName)) { continue }
+        if (-not (Test-PlainPath $dir.FullName)) { continue }
         if (-not (Get-ChildItem -LiteralPath $dir.FullName -Force | Select-Object -First 1)) {
             try { Remove-Item -LiteralPath $dir.FullName -Force } catch { }
         }

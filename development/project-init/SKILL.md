@@ -49,10 +49,12 @@ powershell -ExecutionPolicy Bypass -File <skill_path>/scripts/init_project.ps1 -
 
 The stub holds only the original skill's frontmatter (so the agent can trigger
 it) and the path to the original `<temp-files>/SKILL.md`; the skill itself is
-never copied or linked as a folder. Pass `-TempFilesPath` explicitly when this
-skill is reached through a link. Run
-with `-DryRun` first when the folder is not empty. Do not recreate by hand what
-the script does.
+never copied or linked as a folder. The script accepts `-TempFilesPath` only if
+its `SKILL.md` has `name: temp-files`. Because the stub holds this machine's
+path, the script also appends the stub folders it created to `.gitignore`. Pass
+`-TempFilesPath` explicitly when this skill is reached through a link. Run with
+`-DryRun` first when the folder is not empty. Do not recreate by hand what the
+script does.
 
 Read its report, one line per item: `created`, `skipped`, `would-create`,
 `needs-review` or `failed` (exit code 1). A `failed` item does not stop the

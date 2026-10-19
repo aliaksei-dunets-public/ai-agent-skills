@@ -51,3 +51,12 @@ def test_script_only_deletes_inside_tmp():
 def test_skill_folder_contains_no_tests():
     """Tests live in the repository-level tests/ folder, never next to the skill."""
     assert not (SKILL_DIR / "tests").exists()
+
+
+def test_every_removal_is_guarded_by_a_fresh_link_check():
+    """No Remove-Item without Test-PlainPath on the lines just before it (swap-after-walk guard)."""
+    lines = SCRIPT.read_text(encoding="utf-8").splitlines()
+    removals = [i for i, line in enumerate(lines) if "Remove-Item" in line]
+    assert len(removals) == 2
+    for i in removals:
+        assert any("Test-PlainPath" in line for line in lines[max(0, i - 10):i]), lines[i]

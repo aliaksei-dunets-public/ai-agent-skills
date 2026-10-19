@@ -39,7 +39,7 @@ These are example requests to the agent, not shell commands.
 
 The report includes confirmed vulnerabilities at every severity, a separate list of potential risks, file/line and version, impact, evidence, a fix, and a way to verify it. For initial/full reviews, it also reports coverage for each project component. Secrets are replaced with `[REDACTED]`.
 
-The skill uses available scanners and manual analysis. Missing scanners, an outdated vulnerability database, or an unverified dependency version cannot be treated as a successful check. Project code is not run, packages are not installed, and fixes or commits are not applied automatically. The report is returned in chat; a file is created on request.
+The skill uses whatever scanners are already installed (no specific tool is required) and falls back to manual, redacted analysis. Missing scanners, an outdated vulnerability database, or an unverified dependency version cannot be treated as a successful check. Project code is not run, packages are not installed, and fixes or commits are not applied automatically. The report is returned in chat; a file is created on request.
 
 ## Package contents
 
@@ -47,4 +47,4 @@ The skill uses available scanners and manual analysis. Missing scanners, an outd
 - `references/` — Git handling, tools, review categories, risk assessment, report format, and scope-specific rules (`scopes.md`). `sources.md` is maintainer material (research basis); the agent does not load it.
 - `agents/openai.yaml` — skill metadata and an example invocation in the Codex interface.
 - `evals/` — maintainer material, not loaded at run time: behavioral scenarios, criteria, and activation examples.
-- `templates/` — maintainer material: optional examples for configuring hooks and CI. They are not installed when the skill runs; the skill itself does not technically block `git commit`.
+- `templates/` — maintainer material: an optional checklist of GitHub security controls for separately requested setup. It is not applied when the skill runs; the skill itself does not technically block `git commit`.
