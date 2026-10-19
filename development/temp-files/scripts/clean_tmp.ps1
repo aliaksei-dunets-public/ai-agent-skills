@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Deletes files older than 30 days from <project root>/.tmp/. DRAFT.
+    Deletes files older than 30 days from <project root>/.tmp/.
 
 .DESCRIPTION
     Operates only inside <project root>/.tmp/. A file is deleted only when it is
