@@ -74,7 +74,7 @@ Deduplicate file names and read existing current files. Initial is an alias of f
 
 ## History Secrets
 
-Use the history scanner guidance in tooling.md. State selected refs/range and shallow-clone limitations. A credential removed from current files may still exist in history. History scanning is explicit, not part of staged/full by default.
+Follow the Secrets section of tooling.md (scanner on the selected refs, or the manual location-only search). State selected refs/range and shallow-clone limitations. A credential removed from current files may still exist in history. History scanning is explicit, not part of staged/full by default.
 
 ## Exclusions and Publication Boundaries
 

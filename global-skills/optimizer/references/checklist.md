@@ -13,12 +13,17 @@ package's purpose.
 - Is it neither so broad that it loads for unrelated tasks nor so narrow that
   natural requests miss it?
 - Are inputs, outputs, and boundaries (what it must not do) explicit?
+- When another workflow, graph step, or skill invokes the package, do its
+  defaults (scope, mode, output) match what that caller supplies and expects?
+  Does the caller's trigger condition agree with the `description`?
 
 ## 2. Structure and progressive disclosure
 
 - Does the entry point contain the workflow and decisions, and leave long
   domain detail, examples, and platform specifics to references?
-- Does every reference have a pointer that says **when** to load it?
+- Does every reference have a pointer that says **when** to load it, and does
+  that condition cover every decision that depends on the file? A rule needed
+  on every run must not live only in a file loaded on a narrower condition.
 - Are references loaded only when needed, not "read everything first"?
 - Is nesting shallow (entry point → reference), without reference chains the
   agent must follow to find a basic rule?
@@ -64,6 +69,9 @@ package's purpose.
 - Are there long passages with little decision value: restated goals,
   generic advice the model already follows, narrative history?
 - Are large examples or schemas loaded on every task when few tasks need them?
+- What does a typical and a worst-case run load (entry point plus the
+  references its pointers cause), in bytes? Unlinked and maintainer-only files
+  do not count toward run cost; report them separately from the footprint.
 - Does the workflow search before reading large files or directories?
 
 ## 7. Tools, delegation, and side effects

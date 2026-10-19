@@ -10,7 +10,6 @@ interpret these links as evidence that a scanner ran or an advisory is current.
 - Git raw objects and snapshot reading: https://git-scm.com/docs/git-cat-file
 - Semgrep CLI and network/metrics options: https://docs.semgrep.dev/cli-reference
 - OSV-Scanner usage and offline database options: https://google.github.io/osv-scanner/usage/
-- pip-audit CLI and security model: https://github.com/pypa/pip-audit
 - npm audit CLI and registry submission behavior: https://docs.npmjs.com/cli/v11/commands/npm-audit/
 
 - NIST Secure Software Development Framework (SSDF): https://csrc.nist.gov/projects/ssdf
@@ -19,7 +18,6 @@ interpret these links as evidence that a scanner ran or an advisory is current.
 - GitHub secret scanning and push protection: https://docs.github.com/en/code-security/concepts/secret-security/about-push-protection
 - GitHub CodeQL code scanning: https://docs.github.com/en/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning-with-codeql
 - GitHub dependency review: https://docs.github.com/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review
-- Gitleaks: https://github.com/gitleaks/gitleaks
 - OSV-Scanner: https://google.github.io/osv-scanner/
 - Trivy filesystem scanning: https://trivy.dev/docs/latest/target/filesystem/
 - Agent Skills specification: https://agentskills.io/
