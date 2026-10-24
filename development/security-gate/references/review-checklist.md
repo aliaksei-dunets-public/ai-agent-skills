@@ -2,20 +2,18 @@
 
 Load only the sections relevant to the detected stack and change scope.
 
-For initial/full audits, apply the relevant sections to every inventoried component, including existing code. For staged reviews, trace changes through related code in the index snapshot. Checklists guide investigation; their presence does not make each pattern a finding.
+For full audits, apply the relevant sections to every inventoried component, including existing code. For staged and working-tree reviews, trace changes through related code in the same snapshot. Checklists guide investigation; their presence does not make each pattern a finding. Leaks (secrets, personal and local data, unwanted artifacts) are searched with [leak-patterns](leak-patterns.md); the sections below cover how sensitive data is handled by code.
 
-## Secrets and Sensitive Data
+## Sensitive Data Handling
 
-Look for API keys, cloud credentials, exchange/bot tokens, OAuth client secrets, JWT signing material, passwords, database URLs, private keys, certificates with private material, webhook secrets, cookies, session tokens, encryption keys, recovery codes, and secrets embedded in URLs.
+Beyond committed values, check where code sends sensitive data:
 
-Also inspect:
+- secrets or tokens placed in frontend bundles, mobile apps, public artifacts, client-visible configuration, URLs, or logs;
+- secrets in comments, examples, notebooks, test snapshots, CI output, Docker layers, or generated files;
+- encoded, split, or concatenated values that a pattern search can miss;
+- personal data logged or exposed outside its intended boundary.
 
-- comments, examples, notebooks, test snapshots, fixtures, logs, crash dumps, shell history, CI output, Docker layers, generated files;
-- encoded or split values, concatenated literals, base64/hex strings, high-entropy assignments to sensitive names;
-- `.env`, credential files, kubeconfigs, service-account JSON, PEM/KEY/P12/PFX files;
-- sensitive values placed in frontend bundles, mobile apps, public artifacts, or client-visible configuration.
-
-Do not classify every email, UUID, hash, hostname, or public key as a secret. PII is reportable when it appears to be real production/personal data, creates a privacy risk, or is logged/exposed outside its intended boundary.
+Do not classify every email, UUID, hash, hostname, or public key as a secret.
 
 ## Access Control and Multi-Tenancy
 
@@ -85,17 +83,17 @@ Look for stack traces, secrets, tokens, personal data, query contents, payment d
 
 ## Dependencies and Supply Chain
 
-Review newly added or changed packages first:
+Known-vulnerability (CVE) lookup is outside this skill. Review changed manifests and lockfiles (all of them in full) for supply-chain signals:
 
-- known vulnerabilities and fixed versions;
-- reachability or plausible use of vulnerable functionality;
-- suspicious names, maintainers, registries, Git URLs, forks, or newly created packages;
-- unpinned or floating versions;
-- dependency confusion and private namespace handling;
-- install/postinstall scripts;
-- lockfile consistency and integrity hashes;
-- vendored binaries, downloaded executables, generated clients, and checksums/signatures;
-- abandoned or deprecated security-sensitive libraries.
+- a new dependency: record it; a pinned package from the official registry is informational;
+- unpinned or floating versions (`*`, `latest`, `>=` without an upper bound) in applications;
+- installation from a Git URL, a fork, a local path, a tarball URL, or a non-default registry;
+- names that resemble a popular package (typosquatting) or private names that could resolve from a public registry (dependency confusion);
+- install/postinstall/build scripts added or changed in the package or its configuration;
+- manifest changed without the lockfile, removed integrity hashes, or a lockfile resolving to an unexpected source;
+- vendored binaries, downloaded executables, and generated clients without checksums or signatures.
+
+A signal that needs the user's decision is a potential risk (WARN); do not claim the package is vulnerable or malicious without evidence.
 
 ## CI/CD and Repository Automation
 

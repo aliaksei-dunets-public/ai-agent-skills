@@ -1,4 +1,4 @@
 interface:
   display_name: "Security Gate"
-  short_description: "Security review of staged changes or the whole project"
-  default_prompt: "Use $security-gate to check staged changes and related code for vulnerabilities and concrete risks, then report evidence, severity, fixes, and coverage gaps."
+  short_description: "Pre-commit check for leaked secrets and vulnerabilities"
+  default_prompt: "Use $security-gate to check staged changes and related code for leaked secrets, personal or local data, and vulnerabilities, then report evidence, severity, fixes, and what was not reviewed."

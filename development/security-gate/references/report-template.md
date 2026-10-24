@@ -1,66 +1,87 @@
 # Security Check Report Contract
 
-Keep an empty report short; expand actionable findings. Do not leave unresolved template placeholders in delivered reports.
-
 This is an information contract, not a requirement to print every section or
-table. A clean narrow review needs only the decision, exact scope, a brief
-no-findings statement, actual coverage, and material limits. Include component
-coverage for project/initial/full work; expand findings and risks when present.
-Omit empty potential-risk, hardening, and fix-order sections. Combine repeated
-scope/coverage facts rather than writing them in multiple places.
+table. Keep a clean report short and expand actionable findings. Omit empty
+potential-risk, hardening, and fix-order sections, combine repeated scope and
+coverage facts, and leave no template placeholders in delivered reports. Never
+include secret values: write `[REDACTED]`.
 
 ## Decision
 
-**Overall: PASS | WARN | FAIL** — one-sentence reason and what needs attention before commit/publication.
-
-For project mode, add **Project gate** and **Staged-change gate** (N/A when nothing is staged). Do not imply that a chat verdict installs or enforces a hook.
+**Gate: PASS | WARN | FAIL** — one-sentence reason and what needs attention
+before commit or publication. Do not imply that a chat verdict installs or
+enforces a hook.
 
 ## Scope
 
-- Project/root, mode, time, target revision(s), and reviewed snapshot(s).
-- Detected components/stacks and attribution basis (HEAD, parent, merge base, or unavailable).
-- Changed files reviewed and project areas inspected; identify sampling/exclusions.
-- For initial/full audits, include a compact per-component coverage summary covering each detected stack, its source, secrets, dependencies, and configuration. Show unreviewed components explicitly.
-- Staged versus current-file differences, untracked/ignored files, history/submodules/artifacts included or excluded.
+- Project root, mode, time, and reviewed snapshot (index, HEAD SHA, or selected
+  refs for history-secrets).
+- Detected components/stacks and attribution basis (index vs HEAD, working tree
+  vs HEAD, current files, or unavailable without Git).
+- Files and areas reviewed; exclusions with reasons.
+- For full, a compact per-component summary: leaks, source, configuration/CI/
+  publication, dependency signals. Show unreviewed components explicitly.
+- Staged versus current-file differences, untracked or ignored files, history,
+  submodules, and artifacts included or excluded.
 
 ## Coverage
 
-| Category | Tool/version or manual method | Snapshot / extent | Status | Evidence / limitations |
+| Category | Method | Extent | Status | Limits |
 |---|---|---|---|---|
-| Secrets and sensitive data | ... | ... | ... | ... |
-| Source / SAST | ... | ... | ... | ... |
-| Dependencies / advisories | ... | ... | ... | ... |
-| Config / IaC / CI / publication | ... | ... | ... | ... |
-| Contextual security analysis | ... | ... | ... | ... |
+| Leaks: secrets, personal/local data, artifacts | Location-only pattern search, file-name check, masked classification | ... | ... | ... |
+| Source and security logic | Manual review of changes and related context | ... | ... | ... |
+| Config / CI / publication | ... | ... | ... | ... |
+| Dependency signals | Manifest and lockfile review | ... | ... | ... |
 
-Statuses: **Completed**, **Partial**, **Unavailable**, **Error**, **N/A**. “Completed” describes execution, not absence of findings. Give a reason for N/A and gaps. Include actual sanitized commands, exit status, rules/database freshness, and significant suppressions in brief notes where relevant. Never claim scans ran without results.
+Statuses: **Completed**, **Partial**, **Not reviewable**, **N/A**. "Completed"
+describes the review performed, not absence of findings. Give a reason for N/A
+and Partial. History-secrets reports only the leaks row. State once that
+known-vulnerability (CVE) lookup is outside this skill.
 
-## Confirmed Vulnerabilities
+## Findings
 
-Include **all severities**, not only blockers. Sort by severity and action priority. State “No confirmed vulnerabilities found within the checked scope” when empty.
+Include **all severities**, leaks and code issues alike, sorted by severity and
+action priority. State "No findings within the checked scope" when empty.
 
-| ID | Severity / confidence | Location + snapshot | Attribution | Issue / impact | Gate effect |
+| ID | Severity / confidence | Category | Location + snapshot | Issue / impact | Gate effect |
 |---|---|---|---|---|---|
 
 For every actionable finding give:
 
-- **Evidence:** exact file/line and snapshot; sanitized excerpt or structural description. Use an artifact/config key or advisory ID when a source line is unavailable; never invent a line.
-- **Attack path and impact:** attacker input/identity, boundary, missing control, affected asset, and realistic prerequisites. For configuration/secrets use the equivalent exposure path.
-- **Fix:** smallest concrete root-cause correction.
-- **Verification:** safe regression test or static check; suggested tests are not tests already run.
-- **Reference:** CWE when confidently applicable; for dependencies include advisory URL/ID, resolved version, dependency path, affected range, runtime/build/dev use, reachability, verified fixed version or “not verified / no fix available”.
+- **Evidence:** exact file/line and snapshot; masked excerpt or structural
+  description. For history-secrets: commit SHA, path, line, the refs that
+  contain it, and whether the value is still in current files. Never invent a
+  line.
+- **Attack or exposure path:** attacker input/identity, boundary, missing
+  control, affected asset, prerequisites; for leaks, who can read it once it is
+  committed or published.
+- **Fix:** the smallest concrete root-cause correction (for example move the
+  value to an environment variable or secret store, replace the path with a
+  relative or placeholder one, add the file to the ignore rules).
+- **Verification:** a safe static check or regression test; a suggested test is
+  not a test already run.
+- **Reference:** CWE when confidently applicable; for a dependency signal the
+  package, version or range, source, and the signal.
 
 ## Potential Risks / Needs Verification
 
 | ID | Potential severity / confidence | Location + snapshot | Evidence and missing fact | Consequence | Fix or verification step |
 |---|---|---|---|---|---|
 
-Include concrete concerns when present, especially deployment assumptions, scanner-only candidates, and unverified reachability. Do not present them as confirmed vulnerabilities. Omit this section when empty. Optional hardening observations belong in a short separate list and must be grounded in this project.
+Include concrete concerns, especially deployment assumptions, unverified
+reachability, and candidates whose classification is uncertain. Do not present
+them as confirmed. Optional hardening observations go in a short separate list
+and must be grounded in this project.
 
 ## Fix Order and Remaining Gaps
 
-1. Urgent containment/rotation for likely real exposed credentials or active exposure.
-2. Blocking fixes before commit/publication, referencing finding IDs.
-3. Resolve material unknowns, Medium issues, and missing checks; then Low hardening work.
+1. Urgent containment: revoke and rotate likely real exposed credentials and
+   review their exposure before removing them.
+2. Blocking fixes before commit or publication, referencing finding IDs.
+3. Medium issues, personal and local data, material unknowns, unreviewed
+   content; then Low hygiene and hardening.
 
-List excluded surfaces and exact next steps for incomplete coverage. Explain in one sentence that results apply to the inspected snapshots and do not prove absence of vulnerabilities. Never call a project clean because tools failed or the diff was empty.
+List excluded surfaces and exact next steps for incomplete coverage. State in
+one sentence that results apply to the inspected snapshot and do not prove
+absence of vulnerabilities. Never call a project clean because the diff was
+empty or content could not be read.
