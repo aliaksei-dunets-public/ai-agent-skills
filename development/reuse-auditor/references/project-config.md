@@ -4,14 +4,17 @@ This bundled file holds neutral defaults and is the template for project
 customization. Do not add project-specific content here: the skill clone is shared
 by many projects.
 
-To customize a project, copy this file to the config path named in project
-instructions or beside the selected project-local skill wrapper/installation.
-The legacy Codex path is `<project_root>/.agents/skills/reuse-auditor/project-config.md`;
-a selected Claude installation may use `.claude/skills/reuse-auditor/project-config.md`.
-Use one canonical project owner as described in SKILL.md and fill only applicable
-sections. Do not store target-project policy in a global/shared skill copy. The project
-copy is owned by that project and survives skill updates. Omitted sections fall
-back to the defaults below.
+To customize a project, copy this file into the project and name its path for
+the `reuse-auditor` skill in project instructions (`AGENTS.md`, `CLAUDE.md`, or the
+platform's equivalent), for example `.ai-graph-guide/reuse-auditor.md`. This works
+when the skill is served from a shared clone or a guidance graph. A file beside a
+project-local install (`.agents/skills/reuse-auditor/project-config.md` or
+`.claude/skills/reuse-auditor/project-config.md`) is used only when project
+instructions name no path and that folder holds an installed `SKILL.md`.
+Keep one policy file per project, as described in SKILL.md, and fill only
+applicable sections. Do not store target-project policy in a global/shared skill
+copy. The project copy is owned by that project and survives skill updates.
+Omitted sections fall back to the defaults below.
 
 Project rules may add sources, owners, mechanisms, tests, and stricter gates. They
 must not relax the skill's safety rules: characterization tests before

@@ -1,12 +1,15 @@
 ---
 name: reuse-auditor
 description: >
-  Audit existing code for canonical owners, semantic duplication, and obsolete
-  candidates before decomposing components, extracting shared helpers, services,
-  models, or normalization paths, or consolidating duplicates. Language-agnostic
-  (Python, JavaScript/TypeScript, ABAP, Java, C#, SQL, and others). Do not use for
-  trivial local edits, formatting, documentation-only work, or bug fixes that add
-  no shared abstraction.
+  Audit existing code for canonical owners, semantic duplication, and unused or
+  obsolete code before decomposing components, extracting shared helpers,
+  services, models, or normalization paths, consolidating duplicates, or removing
+  code believed to be unused. Use when asked whether something is already
+  implemented, can be reused, is duplicated, or is safe to delete.
+  Language-agnostic (Python, JavaScript/TypeScript, ABAP, Java, C#, SQL, and
+  others). Read-only: reports decisions, never edits code. Do not use for trivial
+  local edits, formatting, documentation-only work, bug fixes that add no shared
+  abstraction, or general cleanup of a diff (use a simplify or code-review skill).
 ---
 
 # Reuse Auditor
@@ -17,34 +20,53 @@ read-only; it never authorizes deletion, extraction, refactoring, or catalog edi
 
 ## Load project configuration first
 
-Use the config path named in project instructions; else project-config.md beside
-the project-local skill install (`.agents/skills/reuse-auditor/` or
-`.claude/skills/reuse-auditor/` in the project root); else defaults. A
-user/global/shared skill copy is not the project's policy owner. Do not scan
-other platform directories or merge conflicting configs; report ambiguity that
-changes an ownership decision. Read the selected file once per task. It may name
-an ownership/reuse catalog, confirmed owners, known divergences, extra
+Select one project policy file, in this order:
+
+1. the path named for this skill in project instructions (`AGENTS.md`,
+   `CLAUDE.md`, or the platform's equivalent), for example
+   `.ai-graph-guide/reuse-auditor.md`;
+2. `project-config.md` beside a project-local install of this skill
+   (`.agents/skills/reuse-auditor/` or `.claude/skills/reuse-auditor/` in the
+   project root, holding its `SKILL.md`);
+3. otherwise, the defaults below.
+
+A user/global/shared skill copy and a general project configuration (for example
+a guidance graph's `.ai-graph-guide/project-config.md`) are not this skill's
+policy unless project instructions name them for it. Do not scan other platform
+directories or merge conflicting files; report ambiguity that changes an
+ownership decision. Read the selected file once per task. It may name an
+ownership/reuse catalog, confirmed owners, known divergences, extra
 dynamic-dispatch mechanisms, search tools, and required tests. Project rules
 extend this skill; they cannot relax its safety rules. Verify config and catalog
 entries against current source.
 
-If the file is absent, use defaults: no catalog, owners inferred from source and
-tests, targeted repository search, the project's existing test commands. Read the
-bundled [project-config.md](references/project-config.md) template only when asked
-to create or extend a project configuration.
+Defaults: no catalog, owners inferred from source and tests, targeted repository
+search, the project's existing test commands. Read the bundled
+[project-config.md](references/project-config.md) template only when asked to
+create or extend a project configuration.
 
 ## Language profile
 
 Identify the languages of the target and its consumers. Read only the matching
 sections of [language-profiles.md](references/language-profiles.md), or its generic
 section for unlisted languages, when caller discovery or contract comparison
-depends on language mechanisms. Always read them before assigning
-`obsolete-candidate`.
+depends on language mechanisms, and always before assigning `obsolete-candidate`.
+
+Obsolete gate (every language, also without the profile): search string literals
+and configuration for the name; check dynamic dispatch (reflection, registries,
+dependency injection, string-built names), public/exported API status, external
+callers (other repositories, jobs, APIs, other systems), version history, and
+whether tests are the only callers. If the language profile cannot be read (for
+example, the skill text was delivered without its files), say so and cap
+`obsolete-candidate` at `low` confidence.
 
 ## Classifications
 
-- `confirmed-owner`: canonical component with verified consumers and contract
-  tests; reuse it instead of adding a parallel implementation.
+Classify each material candidate by its relationship to existing code. A planned
+implementation is compared the same way: if an existing owner already meets its
+contract, it is an `exact-duplicate` of that owner and the recommendation is
+`reuse-existing`.
+
 - `exact-duplicate`: inputs, outputs, errors, side effects, units, precision, and
   lifecycle match; consolidation candidate.
 - `semantic-duplicate`: overlapping intent with a different boundary or behavior;
@@ -54,9 +76,22 @@ depends on language mechanisms. Always read them before assigning
 - `intentional-divergence`: similarity is superficial or separate ownership is
   safer.
 - `obsolete-candidate`: no verified caller found; removal still requires the
-  dynamic-reference, public-API, history, and test checks from the language profile.
+  obsolete gate and the language-profile checks.
+
+Record the owner's status separately:
+
+- `confirmed-owner`: canonical component with verified consumers and contract
+  tests; reuse it instead of adding a parallel implementation.
+- `unconfirmed-owner`: plausible canonical component whose consumers or contract
+  tests are not verified; reuse may still be recommended, with lower confidence
+  and the missing contract tests as next validation.
+- `no-owner`: nothing existing owns the concern; a new shared component may be
+  proposed.
 
 ## Workflow
+
+If an earlier reuse audit in the same task covers this scope and its inputs are
+unchanged, reuse its decisions instead of repeating the search.
 
 1. State the concern, target scope, and contracts that must stay stable.
 2. Check the configured catalog or ownership map for an existing owner; without
@@ -69,8 +104,8 @@ depends on language mechanisms. Always read them before assigning
    inputs, fallbacks, error behavior, units, precision/rounding, transactions,
    persistence, authorization, concurrency, and lifecycle. Matching names or text
    are hypotheses only.
-5. Assign one classification and confidence (`high | medium | low`) per material
-   candidate.
+5. Assign one classification, the owner status, and confidence
+   (`high | medium | low`) per material candidate.
 6. Recommend `reuse-existing`, `consolidate`, `keep-separate`, `investigate`, or
    `remove-later`. Keep business fixes separate from decomposition.
 7. Stop when each material concern has an ownership decision and further search is
@@ -88,17 +123,23 @@ depends on language mechanisms. Always read them before assigning
 
 ## Report
 
-Report only results that change the decomposition or prevent duplication:
+Return the report to the caller (the user or the invoking workflow step); write it
+to a file only when the caller asks. Report only results that change the
+decomposition or prevent duplication. For one or two concerns:
 
 ```text
 concern / symbols:      <what and where>
-owner:                  <current -> proposed canonical owner>
+owner:                  <current -> proposed canonical owner; owner status>
 consumers:              <verified callers; note unverified dynamic references>
 similar / different:    <semantic comparison>
 evidence:               <contract tests, side effects, sources>
 decision:               <classification, confidence, recommendation>
 next validation:        <characterization tests or checks still required>
 ```
+
+For three or more concerns, use one table with the columns `concern / symbols`,
+`owner (status) and consumers`, `decision` (with the semantic difference and
+evidence), and `next validation`.
 
 Do not list every symbol. If nothing material is found, say so with the evidence
 searched.

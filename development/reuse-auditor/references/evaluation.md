@@ -41,16 +41,47 @@ are otherwise identical.
 Expected: `semantic-duplicate`, high confidence; error behavior differs, so
 consolidation needs a domain decision and characterization tests for both paths.
 
-## Pass criteria
+## Case E: planned helper with an existing owner (Python)
 
-Also check configuration routing with a project-local Claude wrapper and an
-explicit project config elsewhere: the explicit path wins; otherwise use the
-selected local wrapper's sibling config. Missing config uses neutral defaults,
-not a global skill copy's project policy. No cross-platform scan or config edits.
+A plan proposes a new `utils/money.py:to_minor_units(amount, currency)`.
+`finance/currency.py:minor_units()` already converts amounts with the same
+rounding and currency table, has three production consumers, and contract tests.
+
+Expected: `exact-duplicate` of the existing owner, owner status `confirmed-owner`,
+high confidence; recommend `reuse-existing` and no new helper.
+
+## Case F: skill text without its files (any language)
+
+The skill is delivered as `SKILL.md` text only (for example through a guidance
+server); `references/language-profiles.md` cannot be read. A Java class has no
+static callers.
+
+Expected: the report states that the language profile was unavailable, applies the
+obsolete gate from `SKILL.md`, and assigns at most `obsolete-candidate` with `low`
+confidence.
+
+## Case G: configuration routing
+
+Check three setups: (1) project instructions name `.ai-graph-guide/reuse-auditor.md`
+and a project-local Claude install also has a `project-config.md`; (2) only a
+project-local install with `SKILL.md` and `project-config.md`; (3) a
+`.agents/skills/reuse-auditor/` folder holding only `project-config.md`, and the
+project has `.ai-graph-guide/project-config.md`.
+
+Expected: (1) the named path wins; (2) the sibling config is used; (3) defaults,
+because neither file is named for the skill and the folder is not an install. No
+cross-platform scan, no merge of files, no config edits.
+
+## Pass criteria
 
 - A is not rejected merely because it has only two consumers.
 - B is not consolidated because of textual similarity.
 - C is not declared dead from static search alone.
 - D identifies the differing failure behavior.
+- E recommends reusing the confirmed owner instead of adding a parallel helper.
+- F caps confidence and names the missing profile instead of skipping the gate.
+- G selects exactly one policy source per setup.
 - No case causes source edits, deletion, or catalog changes.
-- Each result names owner, consumers, evidence, confidence, and next validation.
+- Each result names the classification, owner and owner status, consumers,
+  evidence, confidence, and next validation; a run of three or more concerns may
+  use the table form.

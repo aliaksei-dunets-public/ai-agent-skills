@@ -15,9 +15,8 @@ mechanisms; it never removes these checks.
 - Contract details: null/empty handling, defaults, error type and propagation,
   numeric precision and rounding, encoding, time zones, units, ordering, mutation of
   inputs, I/O, transactions, caching, thread safety.
-- Before `obsolete-candidate`: search string literals and configuration for the
-  name, check public/exported API status, version history, and whether tests are the
-  only callers.
+- Before `obsolete-candidate`: apply the obsolete gate in `SKILL.md`; the language
+  sections below add the mechanisms to check.
 
 ## Python
 
