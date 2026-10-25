@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Full Redesign"
+  short_description: "Audit a React app and propose a redesign with real mockups"
+  default_prompt: "Use $ui-full-redesign to audit this React application, create three design concepts with desktop and mobile mockups of two representative pages, compare them, and prepare a refactoring roadmap without changing production code."

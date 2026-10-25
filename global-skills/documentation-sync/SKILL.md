@@ -2,9 +2,12 @@
 name: documentation-sync
 description: >
   Create, audit, and synchronize project documentation with changed code,
-  contracts, or task results. Use for documentation updates, conflicting claims,
-  duplicate contracts, broken links, or an explicitly scoped documentation
-  migration. Preserve canonical ownership and distinguish proposals from facts.
+  contracts, or task results, including catalogs of code artifacts (UI
+  components, design tokens, APIs, configuration) and rule documents that
+  agents follow, such as a UI contract. Use for documentation updates,
+  conflicting claims, duplicate contracts, broken links, or an explicitly
+  scoped documentation migration. Preserve canonical ownership and distinguish
+  proposals from facts.
 ---
 
 # Documentation Synchronization
@@ -16,10 +19,15 @@ directories, external tools, or storage assumptions.
 ## Scope and mode
 
 - **Create:** choose the document type and owner within the existing structure.
+  If the project has no place for the topic, propose one under the existing
+  documentation root and state it in the report.
 - **Sync:** update claims affected by the assigned code, contract, or task change.
 - **Audit:** report inconsistencies and recommended actions without editing.
 - **Migrate:** move or restructure only the documents within explicit scope,
   preserving content, history, and incoming links.
+
+Without an explicit mode: no document for the topic → create; changed code or
+task results → sync; a question whether documentation is current → audit.
 
 A request to audit and fix authorizes scoped corrections. An audit alone does
 not authorize them. Do not delete documents without explicit authorization.
@@ -52,7 +60,12 @@ project's policy and authority to change its structure.
    [documentation-model](references/documentation-model.md). Keep design rationale, operational
    plans, current status, results, and archives in their existing owners.
    Read documentation-model when boundaries are unclear or consolidation is
-   needed.
+   needed. For catalogs of code artifacts (components, tokens, APIs,
+   configuration), a UI contract, or rules agents must follow, read
+   [catalogs-and-rules](references/catalogs-and-rules.md): entry status
+   (`implemented`, `planned`, `deprecated`), verification against source, and
+   the project-instructions pointer, which is added only with the user's
+   consent.
 6. **Validate the affected scope.** Check links and anchors, examples against
    current interfaces, terminology, formatting, and project-required checks.
    Read [quality-checks](references/quality-checks.md) for the relevant checks.

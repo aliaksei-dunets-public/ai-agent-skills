@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Review"
+  short_description: "Review UI changes against docs/ui and the redesign audit"
+  default_prompt: "Use $ui-review to check current UI changes against docs/ui/, accessibility, responsive behavior and unchanged business logic, then report findings and a PASS/WARN/FAIL verdict."
