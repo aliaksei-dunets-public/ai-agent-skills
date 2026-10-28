@@ -2,6 +2,9 @@
 
 Apply the items that the scope touches. Cite file and line or screenshot for
 each finding.
+Use the configured contract and audit roots; file names below are defaults,
+not a required document layout. Apply the contract's entry statuses and the
+snapshot rules in `SKILL.md` before declaring a mismatch.
 
 ## Contract conformance (`docs/ui/`)
 
@@ -34,7 +37,8 @@ mobile, navigation reachable, touch targets adequate.
 ## Content and domain
 
 Terminology and formatting per `content.md` and the Domain profile; values,
-totals and formats identical to the base version for the same data.
+totals and formats match the base for the same data unless the reviewed task
+explicitly changes them. Validate requested changes against their requirements.
 
 ## Business-logic guard
 

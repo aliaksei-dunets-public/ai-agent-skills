@@ -38,6 +38,7 @@ Default: contract `docs/ui/`, base branch from Git, no extra commands.
 
 ```text
 contract root: <path>
+redesign audit root: <default docs/ux-audit; same root as ui-full-redesign deliverables>
 base branch: <e.g. main>
 ui test commands: <e.g. npm run test:e2e, npm run lint>
 accessibility tool: <e.g. axe via Playwright>

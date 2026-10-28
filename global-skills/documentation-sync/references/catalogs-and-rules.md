@@ -57,7 +57,8 @@ create request accepts the proposal):
 - content: terminology and formatting of numbers, dates, currency, units and
   missing versus zero values, including domain rules from project instructions.
 
-Split a topic into a folder when it grows beyond roughly 400 lines.
+Split a topic when distinct reader tasks or ownership boundaries make separate
+documents easier to use. Length alone does not justify restructuring.
 
 ## Agent rules
 

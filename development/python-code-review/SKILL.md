@@ -6,7 +6,7 @@ description: >
   behavior before using targeted Python guidance. Use for requested code or
   architecture reviews and project audits; review only unless fixes are requested.
 metadata:
-  version: "2.2.0"
+  version: "2.2.1"
 ---
 
 # Python Code Review
@@ -115,11 +115,13 @@ Keep unverified concerns separate from confirmed findings and suggestions.
 - **Minor:** localized low-risk issue.
 - **Suggestion:** optional alternative without a demonstrated defect.
 
-Verdicts: `BLOCK` for unresolved Critical findings; `REQUEST CHANGES` for
-Blocking findings; `APPROVE WITH FOLLOW-UPS` for acceptable nonblocking work;
-`APPROVE` when no unresolved blockers remain; `INCONCLUSIVE` when evidence or
-required review coverage is insufficient. Explicit acceptance criteria take
-precedence over these defaults.
+Apply verdicts in order: `BLOCK` for unresolved Critical findings;
+`REQUEST CHANGES` for unresolved Blocking findings or Important findings still
+requiring correction or explicit acceptance; `INCONCLUSIVE` when evidence or
+required review coverage is insufficient; `APPROVE WITH FOLLOW-UPS` for accepted
+nonblocking work with remaining actions; otherwise `APPROVE`. Do not infer
+acceptance of an Important risk from silence. Explicit acceptance criteria
+take precedence over these defaults.
 
 Stop when relevant behavior and impact are understood, material hypotheses
 are resolved or labeled, and required checks/reviews are completed or their

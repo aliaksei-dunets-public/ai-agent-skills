@@ -7,6 +7,7 @@ suggest `docs/ux-audit/11-post-implementation-audit.md`.
 UI review — <scope> — <verdict PASS | WARN | FAIL>
 
 Scope:        <files / range / full>; routes: <list>
+Snapshots:    <base and target; revision actually used for each runtime capture>
 Contract:     <docs/ui/ path or "missing">
 Runtime:      <app started: yes/no; viewports; tools used>
 Not verified: <pages, states or checks skipped and why>
@@ -19,7 +20,8 @@ Not verified: <pages, states or checks skipped and why>
 | UR-001 | P0/P1/P2 | contract / states / a11y / responsive / content / logic | file:line or route | | screenshot path, rule cited | |
 
 Severity follows the audit scale: P0 blocks a task, changes business behavior
-or fails WCAG A/AA on a core flow; P1 significant friction or contract
+outside the user's authorized scope, or fails WCAG A/AA on a core flow;
+P1 significant friction or contract
 violation; P2 polish.
 
 ## Docs drift

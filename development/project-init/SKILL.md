@@ -35,7 +35,8 @@ commits.
 ## 2. Deterministic setup (script)
 
 Run [init_project.ps1](scripts/init_project.ps1) once with the decisions from
-step 1. It creates only what is missing and never modifies or deletes anything:
+step 1. It creates missing artifacts and appends required `.gitignore` entries.
+It otherwise preserves existing contents and deletes nothing:
 git repository (`-GitInit`), `docs/` with `README.md`, `.agents/skills/`,
 `.tmp/` and its `.gitignore` line (append only), `AGENTS.md` from
 [the template](assets/AGENTS.template.md), and the stub
@@ -44,7 +45,7 @@ git repository (`-GitInit`), `docs/` with `README.md`, `.agents/skills/`,
 `AGENTS.md` is the single instruction file.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File <skill_path>/scripts/init_project.ps1 -ProjectRoot <root> -TempFilesPath <temp-files> [-GitInit] [-Claude] [-DryRun]
+powershell -ExecutionPolicy Bypass -File "<skill_path>/scripts/init_project.ps1" -ProjectRoot "<root>" -TempFilesPath "<temp-files>" [-GitInit] [-Claude] [-DryRun]
 ```
 
 The stub holds only the original skill's frontmatter (so the agent can trigger
@@ -61,8 +62,11 @@ Read its report, one line per item: `created`, `skipped`, `would-create`,
 others; report it. `needs-review` means an existing artifact was left untouched
 and needs your judgment: an existing `AGENTS.md` (step 3), or a
 link in place of the stub (an older junction; offer to replace it with a stub after
-the user agrees, never delete it yourself). The stub contains this machine's
-path to the original: rerun the skill on another machine.
+the user agrees, never delete it yourself), or an outdated generated stub.
+The script detects changed stub content or source paths but does not overwrite
+the stub. Show the correction and obtain confirmation before updating it.
+Linked destinations or parents fail without writes through the link. Use a
+physical project root and do not run setup while another process replaces paths.
 
 ## 3. Agent instructions
 

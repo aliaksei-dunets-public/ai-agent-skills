@@ -32,7 +32,9 @@ concepts implement the same functions, data and navigation architecture.
 | B — Shadcn Admin | https://github.com/satnaing/shadcn-admin | Productivity: structured navigation, clear data presentation, consistent components |
 | C — TailAdmin | https://github.com/TailAdmin/free-react-tailwind-admin-dashboard | Feature-rich: complex workflows, analytics, data-heavy screens |
 
-If a reference cannot be opened, say so and work from its known style.
+If a reference cannot be opened, state that it was not verified. Use only the
+direction described in the table or supplied evidence; do not invent details
+of the inaccessible reference.
 
 ## Mockup matrix
 

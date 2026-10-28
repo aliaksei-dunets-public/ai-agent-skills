@@ -26,8 +26,11 @@ directories, external tools, or storage assumptions.
 - **Migrate:** move or restructure only the documents within explicit scope,
   preserving content, history, and incoming links.
 
-Without an explicit mode: no document for the topic → create; changed code or
-task results → sync; a question whether documentation is current → audit.
+Without an explicit mode, infer it from the requested action: a question about
+documentation completeness or freshness selects audit; a request to document a
+topic selects create if no owner exists; an update request tied to changed code
+or task results selects sync. Missing documentation alone does not authorize
+creation during an audit.
 
 A request to audit and fix authorizes scoped corrections. An audit alone does
 not authorize them. Do not delete documents without explicit authorization.

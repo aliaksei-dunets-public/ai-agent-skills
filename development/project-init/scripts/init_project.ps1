@@ -3,7 +3,8 @@
     Deterministic, non-destructive part of project-init (Windows PowerShell).
 
 .DESCRIPTION
-    Creates what is missing and never modifies or deletes anything that exists:
+    Creates missing artifacts and appends required ignore entries. Existing
+    artifact contents are otherwise preserved; nothing is deleted:
     folders, the .tmp/ line in .gitignore (append only), docs/README.md,
     AGENTS.md (only when absent), and a stub of the temp-files skill
     (SKILL.md with the original frontmatter and a pointer to the original; the
@@ -42,6 +43,11 @@ param(
 $ErrorActionPreference = "Stop"
 
 $Root = (Resolve-Path -LiteralPath $ProjectRoot).Path
+$RootItem = Get-Item -LiteralPath $Root -Force
+if (-not $RootItem.PSIsContainer) { throw "ProjectRoot must be a directory" }
+if ($RootItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+    throw "ProjectRoot is a link; use the intended physical directory explicitly"
+}
 $SkillDir = Split-Path -Parent $PSScriptRoot
 if ([string]::IsNullOrWhiteSpace($TempFilesPath)) {
     $TempFilesPath = Join-Path (Split-Path -Parent $SkillDir) "temp-files"
@@ -61,9 +67,30 @@ function Step([string]$Item, [scriptblock]$Body) {
     try { & $Body } catch { Report "failed" $Item $_.Exception.Message }
 }
 
+# Reject existing links in destinations and their parents before reading or writing.
+# These checks are not atomic; do not run concurrently with path replacement.
+function Assert-PlainDestination([string]$Path) {
+    $fullPath = [System.IO.Path]::GetFullPath($Path)
+    $rootPrefix = $Root.TrimEnd([char]92, [char]47) + [System.IO.Path]::DirectorySeparatorChar
+    if (-not $fullPath.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Destination is outside ProjectRoot: $Path"
+    }
+    $current = $fullPath
+    while ($current) {
+        $item = Get-Item -LiteralPath $current -Force -ErrorAction SilentlyContinue
+        if ($item -and ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
+            throw "Destination or parent is a link; left untouched: $current"
+        }
+        if ($current.TrimEnd([char]92, [char]47) -eq $Root.TrimEnd([char]92, [char]47)) { return }
+        $current = Split-Path -Parent $current
+    }
+    throw "Cannot verify destination root: $Path"
+}
+
 function Ensure-Dir([string]$Rel) {
     Step $Rel {
         $path = Join-Path $Root $Rel
+        Assert-PlainDestination $path
         if (Test-Path -LiteralPath $path -PathType Container) { Report "skipped" $Rel; return }
         if (Test-Path -LiteralPath $path) { Report "failed" $Rel "exists and is not a folder"; return }
         if ($DryRun) { Report "would-create" $Rel; return }
@@ -76,6 +103,7 @@ function Ensure-Dir([string]$Rel) {
 function Ensure-File([string]$Rel, [string]$Content, [string]$ExistingStatus = "skipped") {
     Step $Rel {
         $path = Join-Path $Root $Rel
+        Assert-PlainDestination $path
         if (Test-Path -LiteralPath $path) { Report $ExistingStatus $Rel "exists, left untouched"; return }
         if ($DryRun) { Report "would-create" $Rel; return }
         [System.IO.File]::WriteAllText($path, $Content, $Utf8)
@@ -106,6 +134,7 @@ function Get-StubContent {
 function Ensure-Stub([string]$Rel) {
     Step $Rel {
         $dir = Join-Path $Root $Rel
+        Assert-PlainDestination (Split-Path -Parent $dir)
         $item = Get-Item -LiteralPath $dir -Force -ErrorAction SilentlyContinue
         if ($item) {
             if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
@@ -114,9 +143,18 @@ function Ensure-Stub([string]$Rel) {
             }
             if (-not $item.PSIsContainer) { Report "failed" $Rel "exists and is not a folder"; return }
             $existing = Join-Path $dir "SKILL.md"
+            Assert-PlainDestination $existing
             if (Test-Path -LiteralPath $existing) {
                 # Our own stub holds a machine-local path: keep it out of git. A foreign copy is not ours to hide.
-                if ([System.IO.File]::ReadAllText($existing).Contains($StubMarker)) { $script:IgnoreLines += "$Rel/" }
+                $existingText = [System.IO.File]::ReadAllText($existing)
+                if ($existingText.Contains($StubMarker)) {
+                    $script:IgnoreLines += "$Rel/"
+                    $expectedText = Get-StubContent
+                    if (($existingText -replace "`r`n", "`n") -ne $expectedText) {
+                        Report "needs-review" $Rel "generated stub differs from its current source; left untouched"
+                        return
+                    }
+                }
                 Report "skipped" $Rel "SKILL.md exists"
                 return
             }
@@ -129,6 +167,7 @@ function Ensure-Stub([string]$Rel) {
         $script:IgnoreLines += "$Rel/"
         if ($DryRun) { Report "would-create" $Rel; return }
         if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+        Assert-PlainDestination (Join-Path $dir "SKILL.md")
         [System.IO.File]::WriteAllText((Join-Path $dir "SKILL.md"), $content, $Utf8)
         Report "created" $Rel "stub pointing to $TempFilesPath"
     }
@@ -164,6 +203,7 @@ if ($Claude) { Ensure-Stub ".claude/skills/temp-files" }
 # 5. .gitignore: append-only; .tmp/ and our own stub folders
 Step ".gitignore" {
     $path = Join-Path $Root ".gitignore"
+    Assert-PlainDestination $path
     $text = if (Test-Path -LiteralPath $path) { [System.IO.File]::ReadAllText($path) } else { $null }
     $have = @()
     if ($null -ne $text) { $have = @($text -split "`r?`n" | ForEach-Object { $_.Trim() }) }

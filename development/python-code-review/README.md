@@ -1,4 +1,4 @@
-# Python Code Review 2.2
+# Python Code Review 2.2.1
 
 A general-purpose skill for reviewing Python code. It first reconstructs the
 behavior of the affected system, then tests hypotheses about defects and uses
@@ -31,6 +31,10 @@ A typical result includes findings with their sources, triggering conditions,
 impact, and fixes, along with checks performed and coverage limits. Add a
 verdict when requested or for a merge review. A detailed architecture report is
 needed only on request or for significant systemic risks.
+
+Verdicts follow an explicit order: established blockers take precedence over
+incomplete coverage, while insufficient required evidence prevents approval.
+Important findings need correction or explicit acceptance before approval.
 
 Use an independent reviewer when the user or project requires one, or when
 authorized delegation would add useful scrutiny. Tool availability alone does

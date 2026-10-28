@@ -27,6 +27,10 @@ Domain-specific checks (for example financial formatting), launch and sign-in in
 
 ## Results
 
+The selected deliverables root also applies to prototype paths and the later
+`ui-review` handoff. Runtime checks use a trusted local test environment;
+unavailable checks remain explicit plan items, not completed verification.
+
 Deliverables go to `docs/ux-audit/`: tool readiness, application inventory, audit with P0/P1/P2 issues, quick wins, navigation architecture, design system, mockup selection, mockups per concept, comparison, roadmap, validation plan and a summary. Raw captures stay in `.tmp/`. Reports follow the language set by agent and project instructions, otherwise the language of the request.
 
 ## Package contents

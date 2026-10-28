@@ -23,7 +23,7 @@ technical assessment, not execution or user acceptance.
 | Completeness | TODOs, placeholders, "TBD", incomplete sections |
 | Consistency | Internal contradictions, conflicting requirements |
 | Clarity | Requirements ambiguous enough to cause someone to build the wrong thing |
-| Scope | Focused enough for a single plan — not covering multiple independent subsystems |
+| Scope | Matches the authorized goal, with boundaries and dependencies clear when several subsystems are involved |
 | YAGNI | Unrequested features, over-engineering |
 
 ## Calibration

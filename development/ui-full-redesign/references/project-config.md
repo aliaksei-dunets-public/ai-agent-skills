@@ -56,6 +56,9 @@ root: <path>
 prototype directory: <path outside application source>
 ```
 
+Use this root for every audit artifact and pass it to `ui-review` as its
+redesign audit root. Do not create a second set under the default directory.
+
 ## Additional rules
 
 Default: none.

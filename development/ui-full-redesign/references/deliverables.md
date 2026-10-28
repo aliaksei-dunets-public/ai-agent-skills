@@ -21,7 +21,10 @@ docs/ux-audit/
     concept-c-tailadmin/
 ```
 
-Use another root only when the project profile names one. Fallback prototypes,
+Use another root only when the project profile names one, and carry that root
+into the `ui-review` handoff. Replace `docs/ux-audit/` in artifact paths with
+that root; UI contract paths remain separate.
+Fallback prototypes,
 if approved, go to `docs/ux-audit/prototypes/` or a path the profile names,
 never inside the application source. Raw captures and logs stay in `.tmp/`.
 Deliverables never contain secrets or real personal or financial data.
@@ -55,9 +58,11 @@ Use Playwright or the available automation. Include user scenario tests,
 navigation tests, form and filter behavior, desktop and mobile visual
 regression, accessibility checks (for example axe), responsive layout checks,
 state and error behavior, and domain data display integrity (formatting and
-values identical before and after). Run the same scenarios against the current
-UI and the proposed design. Claim usability or performance gains only with
-measured evidence.
+values identical before and after). Specify the same scenarios for the current
+UI and proposed design. Execute only checks supported by the available app or
+prototype within the authorized scope; label the rest as planned. Static mockups
+cannot establish runtime behavior. Claim usability or performance gains only
+with measured evidence.
 
 ## Summary (`00-summary.md`)
 

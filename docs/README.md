@@ -14,3 +14,16 @@ Table of contents for project documentation.
   reviews, secret-safe evidence handling, and gate policy.
 - [Temporary files](../development/temp-files/SKILL.md): artifact locations,
   retention rules, explicit cleanup roots, and incomplete-cleanup reporting.
+- [Project initialization](../development/project-init/SKILL.md): repeatable
+  setup, preservation of existing files, and generated-stub review.
+- [Python code review](../development/python-code-review/README.md): semantic
+  review, verification boundaries, and ordered verdict criteria.
+- [UI redesign](../development/ui-full-redesign/README.md) and
+  [UI review](../development/ui-review/README.md): design proposals, configured
+  artifact roots, snapshot-specific evidence, and implementation review.
+- [Brainstorming](../global-skills/brainstorming/SKILL.md): requirements,
+  design exploration, and proportionate implementation planning.
+- [Documentation synchronization](../global-skills/documentation-sync/SKILL.md):
+  explicit audit/create/sync scopes and canonical document ownership.
+- [Prompt authoring](../global-skills/prompter/SKILL.md): creation, improvement,
+  and review of standalone prompts.
