@@ -75,8 +75,10 @@ The script never touches an existing instruction file. Audit them here.
 1. Read every existing instruction file first: `AGENTS.md`, `CLAUDE.md`,
    `.claude/CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`,
    `.cursorrules`, `.cursor/rules/`.
-2. Compare each standard section of `AGENTS.md` (Language, Documentation,
-   Temporary files, Git Branches for Agent Work; the standard text is [the template](assets/AGENTS.template.md))
+2. Compare each standard section of `AGENTS.md` (Language,
+   Responses to the user, Documentation, Temporary files,
+   Git Branches for Agent Work; the standard text is
+   [the template](assets/AGENTS.template.md))
    with the existing file:
    - **missing**: add it;
    - **conflicting** (contradicts the standard in meaning: another documentation

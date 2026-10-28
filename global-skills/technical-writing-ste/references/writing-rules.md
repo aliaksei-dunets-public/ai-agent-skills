@@ -1,8 +1,13 @@
 # Technical Writing Rules
 
-Apply these adapted STE principles in context. Accuracy and unambiguous meaning
-take priority over clarity and brevity. Use the behavior contract in
-[SKILL.md](../SKILL.md) when editing instructions.
+Apply these adapted STE principles in context. Use the priorities and the
+behavior contract in [SKILL.md](../SKILL.md).
+
+## Accuracy
+
+Check statements about code, commands, paths, versions, and behavior against
+the available sources. Do not present an assumption as a fact. If you cannot
+check a statement, keep it out of the text or mark it as unchecked.
 
 ## Sentences and actions
 
@@ -31,6 +36,10 @@ Explain unfamiliar abbreviations when the audience needs the explanation.
 For example, "Check the configuration" is usually clearer than
 "Perform a verification of the configuration." Retain a specialized term
 such as "verification" when it names a defined process.
+
+Replace a pronoun such as "it", "this", or "that" with the noun when the
+reader could link the pronoun to more than one item. Prefer a positive
+statement to a double negative.
 
 ## Voice and responsibility
 
@@ -77,17 +86,26 @@ Preserve code, commands, identifiers, paths, and data formats exactly during
 language edits. A suspected technical error is a separate finding, not a reason
 to silently change a technical token.
 
+## Russian text
+
+Apply the same rules to Russian text. Do not translate a document merely to
+apply these principles. Also check these Russian-specific problems:
+
+- Chains of verbal nouns: replace "осуществить проведение проверки" with
+  "проверить".
+- Passive forms that hide the actor: replace "конфигурация проверяется" with
+  "агент проверяет конфигурацию" when the actor matters.
+- Inconsistent modal words: keep one wording for each requirement strength in
+  the document, for example "необходимо" for `must`, "следует" for `should`,
+  and "можно" for `may`. Do not change the strength when you change the word.
+- Mixed instruction forms: use one form in a list, either the imperative
+  ("проверьте") or the infinitive ("проверить").
+
 ## Final comparison
 
-Compare the original and revised instructions, including their examples:
-
-- Do they require the same actions under the same conditions?
-- Are requirement strength, permissions, prohibitions, and exceptions unchanged?
-- Is the order of dependent actions unchanged?
-- Are technical details, dependencies, and completion criteria intact?
-- Does each edit address a concrete problem without adding a requirement?
+Compare the original and revised text, including its examples, with each item
+of the behavior contract. Confirm that each edit addresses a concrete problem
+and adds no requirement.
 
 For example, keep "Run tests if the implementation changes" conditional.
 "Always run tests" changes behavior and is not a valid language edit.
-Apply the same comparison to Russian text; do not translate a document merely
-to apply these principles.

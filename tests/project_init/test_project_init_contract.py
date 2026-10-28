@@ -66,6 +66,13 @@ def test_template_has_git_branch_rules():
     assert "Do not merge or push `ai_feature` unless the user asks." in text
 
 
+def test_template_has_response_rules():
+    text = TEMPLATE.read_text(encoding="utf-8")
+    assert "## Responses to the user" in text
+    assert "Report what you verified and what you did not verify." in text
+    assert "Keep requirement strength" in text
+
+
 def test_skill_lists_all_template_sections():
     skill = SKILL.read_text(encoding="utf-8")
     sections = re.findall(r"^## (.+)$", TEMPLATE.read_text(encoding="utf-8"), re.M)
