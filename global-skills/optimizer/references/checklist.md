@@ -25,15 +25,16 @@ package's purpose.
   that condition cover every decision that depends on the file? A rule needed
   on every run must not live only in a file loaded on a narrower condition.
 - Are references loaded only when needed, not "read everything first"?
-- Is nesting shallow (entry point → reference), without reference chains the
-  agent must follow to find a basic rule?
+- Are reference routes clear and justified, including cross-skill dependencies,
+  without unnecessary indirection or repeated loading?
 - Are always-on files (`AGENTS.md`, `CLAUDE.md`, Copilot instructions) short
   and limited to facts needed on most tasks?
 
 ## 3. Consistency
 
-- Does each rule live in exactly one place? If repeated, are the copies
-  identical and is the repetition deliberate?
+- Does each shared rule have a canonical source? Are repeated copies consistent
+  and necessary for their consumers? Would removing a copy leave an executor
+  without the rule when it is needed?
 - Do numbers, limits, names, modes, file names, and option names agree across
   all files?
 - Do examples obey the rules they illustrate?
@@ -53,14 +54,20 @@ package's purpose.
 
 ## 5. Clarity
 
+Apply the writing rules from `technical-writing-ste`, loaded through the
+optimizer entry point. Report only concrete issues, not stylistic preferences.
+
 - Is each rule actionable: a condition, an action, and when it is done?
-- Are vague verbs replaced with observable actions ("handle errors" →
-  "report the failing command and stop")?
+- Are vague actions clarified from established requirements? For example,
+  "handle errors" does not by itself justify mandatory reporting or stopping.
+  If the intended action is unknown, is that ambiguity reported without guessing?
 - Are terms defined where first used?
 - Are stop conditions and completion criteria explicit?
 - Does the text explain *why* for non-obvious rules, so the agent can apply
   them to unforeseen cases?
 - Is there process micromanagement where an outcome and criteria would do?
+- Do proposed language edits preserve the behavior contract, including
+  requirement strength, conditions, exceptions, and dependent action order?
 
 ## 6. Context efficiency
 
@@ -69,9 +76,10 @@ package's purpose.
 - Are there long passages with little decision value: restated goals,
   generic advice the model already follows, narrative history?
 - Are large examples or schemas loaded on every task when few tasks need them?
-- What does a typical and a worst-case run load (entry point plus the
-  references its pointers cause), in bytes? Unlinked and maintainer-only files
-  do not count toward run cost; report them separately from the footprint.
+- Does the load map distinguish instruction-file bytes for stated scenarios
+  from files read as audit material, including inspected unlinked and maintainer
+  files? Are dependencies included and overlaps identified without double counting?
+- Are file sizes distinguished from total context cost and measured token usage?
 - Does the workflow search before reading large files or directories?
 
 ## 7. Tools, delegation, and side effects
@@ -117,6 +125,7 @@ Only when the package uses tools or subagents.
 
 - Do version-specific or platform-specific claims carry a date or a note that
   they need verification?
-- Is there a changelog entry and version bump for behavior changes?
+- If the package uses release metadata, do behavior changes follow its release
+  convention, and does the current version agree with the latest release entry?
 - Are there leftover files, dead sections, TODOs, or references to removed
   features?

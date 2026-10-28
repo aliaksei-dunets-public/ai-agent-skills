@@ -9,7 +9,7 @@ upstream repositories.
 
 | Directory | Contents |
 | --- | --- |
-| `global-skills/` | General-purpose skills for brainstorming, documentation synchronization, optimization, and prompt authoring. |
+| `global-skills/` | General-purpose skills for brainstorming, documentation synchronization, optimization, prompt authoring, and technical writing. |
 | `development/` | Development skills for coding discipline, reuse auditing, Python code review, security checks, UX/UI redesign audits, UI change review, temporary-file handling, and project initialization. |
 | `abap-skills-core/` | ABAP-focused skills, included as a Git submodule. |
 | `anthropic-skills/` | Skills from Anthropic's public skills repository, included as a Git submodule. |

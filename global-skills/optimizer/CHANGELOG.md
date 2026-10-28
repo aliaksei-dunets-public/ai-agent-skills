@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.2.1 — 2026-10-28
+
+- Synchronized `VERSION` with this release; it remained at 2.1.0 after the
+  2.2.0 documentation update.
+- Preserve necessary repeated rules when independent executors cannot load
+  the canonical source. Removed the checklist example that implied adding
+  mandatory reporting and stopping without established requirements.
+- Classify paths before checking existence and distinguish historical records
+  from current dependencies and release metadata.
+- Clarified conditional reference loading and allowed justified cross-skill
+  reference chains instead of requiring a single level.
+- Separate instruction-file sizes from inspected audit materials and identify
+  overlaps; do not equate file bytes with total context cost.
+- Use semantic comparison and targeted duplicate searches. Removed the
+  grammatical-person prescription and limited release updates to existing
+  package conventions.
+
+## 2.2.0 — 2026-10-28
+
+- Added `technical-writing-ste` as a dependency for language review and edits,
+  with installation instructions and explicit reporting when it is unavailable.
+- Kept `audit` read-only and separated functional repairs from language edits
+  that must preserve behavior.
+- Clarified load-map instructions and ambiguous-rule handling. Corrected a
+  writing-guide example that could imply adding unstated requirements.
+- Added verification of requirement strength, conditions, and action order.
+
 ## 2.1.0 — 2026-10-19
 
 - Found while auditing `security-gate` (defaults wrong for a calling workflow, a

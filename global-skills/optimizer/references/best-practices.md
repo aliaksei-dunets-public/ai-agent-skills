@@ -3,12 +3,18 @@
 Use when rewriting instructions. These are defaults, not a template: keep the
 author's structure where it already works.
 
+Use `technical-writing-ste`, loaded through the optimizer entry point, for
+language rules and the behavior contract. The guidance below covers instruction
+design and package repairs. Examples illustrate possible requirements; they
+do not authorize adding those requirements to the text being edited.
+
 ## Say what, when, and why
 
 - Lead with the outcome and success criteria; add procedure only where order
   matters or the agent repeatedly goes wrong.
-- Write rules as condition → action: "If tests fail, report the failing test
-  and stop" instead of "be careful with tests".
+- Write known rules as condition → action. For example, use "If tests fail,
+  report the failing test and stop" only when those actions are established
+  requirements. Do not infer them from "be careful with tests."
 - Give the reason for non-obvious rules in one clause. A model applies a
   reasoned rule to new cases; a bare command it applies literally.
 - Prefer positive instructions ("reply in the user's language") over lists of
@@ -20,7 +26,8 @@ author's structure where it already works.
 
 - Choose the canonical location by scope: always-on facts in the project
   instruction file, task procedures in a skill, detail in a reference.
-- Replace other copies with a pointer ("see `references/x.md`") or delete them.
+- Consolidate copies using the executor-access check in step 5 of `SKILL.md`;
+  preserve necessary repetition for independent consumers.
 - When layers must coexist, state precedence once.
 
 ## Progressive disclosure
@@ -28,12 +35,15 @@ author's structure where it already works.
 - Entry point: purpose, modes, workflow, key decisions, pointers.
 - References: detailed checklists, domain knowledge, long examples, platform
   or model specifics. Each pointer says when to load the file.
-- Keep references one level deep; a basic rule should not require following a
-  chain of files.
+- Keep reference routes easy to follow. Additional levels are justified when
+  they reuse a maintained dependency or separate conditional detail. Avoid
+  indirection that adds no decision value and do not reload files already read.
 
 ## Descriptions and triggers
 
-- Third person, specific: what it does + when to use it + (if needed) when not.
+- State what the skill does, when to use it, and exclusions when needed.
+  Follow the target platform's format requirements; do not change grammatical
+  person solely for style.
 - Include the natural phrases users say ("audit", "clean up", "fix links").
 - Mention the neighboring skill to use instead, when overlap is likely.
 
@@ -68,6 +78,6 @@ author's structure where it already works.
   terminology, language, and tone unless a finding requires changing them.
 - Keep paths, commands, identifiers, and quotations exact.
 - After moving or renaming anything, update every reference to it.
-- Update the guide/README, examples, changelog, and version together with
-  behavior changes.
+- Update affected documentation and existing release metadata using step 5
+  of `SKILL.md`; do not impose a new release process.
 - Do not add sections, files, or frameworks the package did not need.
