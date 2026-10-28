@@ -65,10 +65,18 @@ the name's date prefix (if any) and the modification time are older than 30
 days (the threshold cannot be lowered). It skips `keep/`, never follows or
 deletes symlinks and junctions, skips locked files and reports them, and
 removes empty nested folders afterwards (first-level folders stay).
+It rechecks paths and file age before deletion, including whether `.tmp` became
+a link. These checks are not atomic: do not run cleanup while other processes
+are changing paths in the temporary tree. Exit code 1 indicates incomplete
+cleanup or an error; report skipped items without manually deleting them.
+
+Pass the intended project root explicitly. `-ProjectRoot .` means the current
+directory; omitting the parameter discovers the Git root or uses the current
+directory when Git is unavailable. Quote paths that contain spaces.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File <skill_path>/scripts/clean_tmp.ps1 -ProjectRoot .          # clean
-powershell -ExecutionPolicy Bypass -File <skill_path>/scripts/clean_tmp.ps1 -ProjectRoot . -DryRun  # preview
+powershell -ExecutionPolicy Bypass -File "<skill_path>/scripts/clean_tmp.ps1" -ProjectRoot "<project_root>"          # clean
+powershell -ExecutionPolicy Bypass -File "<skill_path>/scripts/clean_tmp.ps1" -ProjectRoot "<project_root>" -DryRun  # preview
 ```
 
 Run once, on successful task completion; not after a failure, so artifacts stay

@@ -10,15 +10,18 @@ platform's equivalent), for example `.ai-graph-guide/reuse-auditor.md`. This wor
 when the skill is served from a shared clone or a guidance graph. A file beside a
 project-local install (`.agents/skills/reuse-auditor/project-config.md` or
 `.claude/skills/reuse-auditor/project-config.md`) is used only when project
-instructions name no path and that folder holds an installed `SKILL.md`.
+instructions name no path and that folder is the project-local install being used.
 Keep one policy file per project, as described in SKILL.md, and fill only
 applicable sections. Do not store target-project policy in a global/shared skill
 copy. The project copy is owned by that project and survives skill updates.
 Omitted sections fall back to the defaults below.
+An explicitly selected but unreadable or missing policy is a reported coverage
+gap, not a reason to substitute a different policy or assume defaults.
 
 Project rules may add sources, owners, mechanisms, tests, and stricter gates. They
 must not relax the skill's safety rules: characterization tests before
-consolidation or removal, read-only audits, and candidate-first catalog updates.
+consolidation or removal, read-only audits, and candidate-first catalog updates
+performed only in a separately requested documentation task.
 
 ## Ownership catalog
 

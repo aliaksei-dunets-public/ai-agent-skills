@@ -100,9 +100,9 @@ of the selected mode.
 
 ## Gate and report
 
-Read [severity](references/severity.md) when rating a finding or deciding WARN
-versus FAIL; it is the canonical gate policy. In short: FAIL for an effective
-secret or private key or a confirmed High/Critical issue; WARN for Medium
+Read [severity](references/severity.md) before assigning any gate; it is the
+canonical gate policy. In short: FAIL for a likely effective credential or
+private key, bulk real personal records, or a confirmed High/Critical issue; WARN for Medium
 issues, personal or local data leaks, material unverified risks, or content
 that could not be reviewed; otherwise PASS. Coverage means the categories
 actually reviewed; the absence of scanners is not a gap.

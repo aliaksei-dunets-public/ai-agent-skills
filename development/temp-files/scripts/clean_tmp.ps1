@@ -35,13 +35,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-if ([string]::IsNullOrWhiteSpace($ProjectRoot) -or $ProjectRoot -eq ".") {
+if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
     $gitRoot = $null
     try { $gitRoot = (& git rev-parse --show-toplevel 2>$null) } catch { }
     $ProjectRoot = if ($gitRoot) { $gitRoot } else { (Get-Location).Path }
 }
 
 $RootPath = (Resolve-Path -LiteralPath $ProjectRoot).Path
+$rootItem = Get-Item -LiteralPath $RootPath -Force
+if (-not $rootItem.PSIsContainer) { throw "ProjectRoot must be a directory: $RootPath" }
 $TmpDir = Join-Path $RootPath ".tmp"
 
 if (-not (Test-Path -LiteralPath $TmpDir -PathType Container)) {
@@ -61,15 +63,17 @@ function Test-InsideTmp([string]$Path) {
     return $Path.StartsWith($TmpPrefix, [System.StringComparison]::OrdinalIgnoreCase)
 }
 
-# Re-checked right before every deletion: the item and every parent below .tmp must
-# still exist and be a plain file/folder (not swapped for a link after the walk).
+# Re-check the item and its parents, including .tmp, before deletion.
+# This reduces stale-path risk; it is not atomic against concurrent path changes.
 function Test-PlainPath([string]$Path) {
+    if (-not (Test-InsideTmp $Path)) { return $false }
     $current = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
-    while ($current -and $current.FullName.TrimEnd([char]92) -ne $TmpItem.FullName.TrimEnd([char]92)) {
+    while ($current) {
         if ($current.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { return $false }
+        if ($current.FullName.TrimEnd([char]92) -eq $TmpItem.FullName.TrimEnd([char]92)) { return $true }
         $current = if ($current -is [System.IO.DirectoryInfo]) { $current.Parent } else { $current.Directory }
     }
-    return [bool]$current
+    return $false
 }
 
 function Get-EffectiveDate([System.IO.FileInfo]$File) {
@@ -110,21 +114,22 @@ Write-Host "clean_tmp [$mode] root=$RootPath cutoff=$($Cutoff.ToString('yyyy-MM-
 
 foreach ($file in $files) {
     if (-not (Test-InsideTmp $file.FullName)) { continue }
-    if ((Get-EffectiveDate $file) -ge $Cutoff) { continue }
-
-    if ($DryRun) {
-        Write-Host " [WOULD REMOVE] $($file.FullName)"
-        $deleted++
-        $bytes += $file.Length
-        continue
-    }
     try {
         if (-not (Test-PlainPath $file.FullName)) {
             Write-Host " [SKIPPED] $($file.FullName): changed during the run"
             $skipped++
             continue
         }
-        $size = $file.Length
+        $freshFile = Get-Item -LiteralPath $file.FullName -Force
+        if ($freshFile -isnot [System.IO.FileInfo]) { throw "Path is no longer a regular file" }
+        if ((Get-EffectiveDate $freshFile) -ge $Cutoff) { continue }
+        $size = $freshFile.Length
+        if ($DryRun) {
+            Write-Host " [WOULD REMOVE] $($file.FullName)"
+            $deleted++
+            $bytes += $size
+            continue
+        }
         Remove-Item -LiteralPath $file.FullName -Force
         Write-Host " [REMOVED] $($file.FullName)"
         $deleted++
@@ -143,11 +148,15 @@ if (-not $DryRun) {
         if (-not (Test-InsideTmp $dir.FullName)) { continue }
         if (-not (Test-PlainPath $dir.FullName)) { continue }
         if (-not (Get-ChildItem -LiteralPath $dir.FullName -Force | Select-Object -First 1)) {
-            try { Remove-Item -LiteralPath $dir.FullName -Force } catch { }
+            try { Remove-Item -LiteralPath $dir.FullName -Force } catch {
+                Write-Host " [SKIPPED] $($dir.FullName): $($_.Exception.Message)"
+                $skipped++
+            }
         }
     }
 }
 
 Write-Host ("Files {0}: {1}, freed {2} MB, skipped {3}" -f
     $(if ($DryRun) { "to remove" } else { "removed" }), $deleted, [math]::Round($bytes / 1MB, 2), $skipped)
+if ($skipped -gt 0) { exit 1 }
 exit 0

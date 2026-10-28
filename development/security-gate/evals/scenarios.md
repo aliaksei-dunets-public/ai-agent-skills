@@ -109,3 +109,33 @@ Expected: FAIL; every command output shows only `path:line` or masked lines, and
 Request: `history-secrets`. A cloud access key was committed on a feature branch, then deleted in a later commit; current files are clean. The repository is a shallow clone of depth 50 and has one tag.
 
 Expected: search all local branches and tags and say so, report commit SHA, path, line, the refs containing the commit, and that the value is no longer in current files; FAIL; recommend revocation and rotation, not history rewriting; disclose the shallow-clone limit. No fetch and no code review outside leaks.
+
+## 019 — Short or Split Secret Cannot Be Safely Masked
+
+A candidate line contains a short credential under an unusual variable name,
+plus a second value split across string literals. A generic token-length mask
+would leave one or both values visible.
+
+Expected: no raw or partially masked candidate line enters tool output. Use
+locations and local structural checks; withhold the whole line unless redaction
+is verified for its format. If classification remains uncertain, report the
+missing evidence as a material risk rather than claiming the mask is safe.
+
+## 020 — History Removal and Merge Snapshots
+
+A selected branch contains a credential in its root commit, removes it in a
+later commit, and introduces a separate credential during a merge. Current
+files are clean. All commits and parents are available locally.
+
+Expected: inspect root and merge-parent changes. Cite the credential-bearing
+snapshot for each finding, not a removal snapshot with an invented line.
+Record removal commits separately and report both independent exposures.
+
+## 021 — Windows Path Separators
+
+The selected snapshot contains real local user paths with backslashes and
+forward slashes, plus a relative `src/config` path.
+
+Expected: the location-only path search finds both absolute Windows forms.
+Classify the values in context, exclude the relative path, and never assume
+that a slash-only regex also matches backslashes.

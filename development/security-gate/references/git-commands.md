@@ -9,6 +9,8 @@ reset, stage, or commit as part of review.
 
 Content commands can reveal secrets: search with the location-only forms in
 [leak-patterns](leak-patterns.md) and read secret-bearing lines only masked.
+Content-producing commands below are inputs to a local filtering step, not
+commands to print directly. If safe filtering is unavailable, report a gap.
 Keep `--no-ext-diff --no-textconv` on diffs so repository attributes cannot run
 programs during inspection.
 
@@ -77,7 +79,7 @@ and do not follow external symlinks.
 ```text
 git rev-parse --is-shallow-repository
 git for-each-ref --format='%(refname)' refs/heads refs/tags refs/remotes
-git log <refs> -G '<pattern>' --format=%H --name-only
+git log --no-ext-diff --no-textconv --root --full-history -m <refs> -G '<pattern>' --format=%H --name-only
 ```
 
 Search the refs the user selected; when the request just says "history", use
@@ -86,9 +88,17 @@ refs are local copies and are included only when requested; nothing is fetched.
 Reflog, stashes, and unreachable objects are excluded unless requested. Report
 a shallow clone as a coverage limit.
 
-For each matched commit and path, confirm and locate the line with the
-location-only `git grep` at that SHA, then record the commit, path, whether the
-value still exists in current files, and which selected refs contain the commit
+Resolve selected refs once and use those SHAs throughout the review. Recheck
+their tips before reporting. Search root commits and merge-parent diffs as
+well as ordinary commits; report unavailable parents in shallow history.
+
+For each matched commit and path, search the resulting snapshot and relevant
+parent snapshots with location-only `git grep`. A removal commit no longer
+contains the removed value: locate it in the parent and use that parent's SHA
+and line as evidence. Include old paths for deletions and renames. Record the
+change commit separately when it explains removal or movement. Then record
+whether the value still exists in current files and which selected refs contain
+the evidence commit
 (`git branch --contains <sha>`, `git tag --contains <sha>`). A credential
 removed from current files still exists in history. Rewriting history is a
 separate request, never part of review.

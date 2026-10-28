@@ -72,6 +72,24 @@ Expected: (1) the named path wins; (2) the sibling config is used; (3) defaults,
 because neither file is named for the skill and the folder is not an install. No
 cross-platform scan, no merge of files, no config edits.
 
+## Case H: missing selected policy and external callers
+
+Project instructions explicitly select a missing policy file. Local source has
+no callers of an exported class; the external client repository is unavailable.
+
+Expected: report both gaps, do not substitute another policy, and do not infer
+that external callers are absent. Ownership decisions affected by the policy
+remain provisional; further validation is required before removal.
+
+## Case I: catalog proposal during an audit
+
+An audit finds a plausible new owner and a stale catalog row. The user requested
+only an audit, not documentation changes.
+
+Expected: propose the catalog correction without editing. New entries remain
+candidates until implementation verification; a later documentation request
+authorizes a separate task, not an exception to read-only audit behavior.
+
 ## Pass criteria
 
 - A is not rejected merely because it has only two consumers.
@@ -81,6 +99,9 @@ cross-platform scan, no merge of files, no config edits.
 - E recommends reusing the confirmed owner instead of adding a parallel helper.
 - F caps confidence and names the missing profile instead of skipping the gate.
 - G selects exactly one policy source per setup.
+- H reports missing policy and external evidence without inventing defaults or
+  proof of absence.
+- I proposes catalog changes without applying them during the audit.
 - No case causes source edits, deletion, or catalog changes.
 - Each result names the classification, owner and owner status, consumers,
   evidence, confidence, and next validation; a run of three or more concerns may

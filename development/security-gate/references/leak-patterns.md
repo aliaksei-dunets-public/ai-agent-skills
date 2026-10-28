@@ -15,35 +15,44 @@ otherwise read as an option.
 - staged: `git grep --cached -I -n -E -e '<pattern>' | cut -d: -f1,2`
 - working-tree, full: `git grep --untracked -I -n -E -e '<pattern>' | cut -d: -f1,2`
 - full without Git: `grep -rnIE --exclude-dir=.git -e '<pattern>' . | cut -d: -f1,2`
-- history-secrets: `git log <refs> -G '<pattern>' --format=%H --name-only`
-  lists commits and files; then
+- history-secrets: `git log --no-ext-diff --no-textconv --root --full-history -m <refs> -G '<pattern>' --format=%H --name-only`
+  lists change commits and files; inspect the resulting and relevant parent
+  snapshots as described in [git-commands](git-commands.md), then use
   `git grep -I -n -E -e '<pattern>' <sha> -- <path> | cut -d: -f1-3`.
 
-Add `-i` for the case-insensitive classes. Limit working-tree searches to the
-changed paths after `--`; full searches the whole tree. In PowerShell replace
+The colon-splitting examples assume paths without colons or newlines. For other
+names, parse NUL-delimited Git output locally or query each exact path and emit
+only its known name and line numbers. Never fall back to printing raw matches.
+Check the search command's exit status before treating empty output as no hits:
+for Git grep, 1 means no matches; a larger status means failure and a coverage gap.
+
+Add `-i` to grep for the case-insensitive classes. For `git log -G`, use a
+case-insensitive pattern supported by its diff regex engine; `git log -i`
+applies to commit-message matching, not the `-G` content pattern.
+
+Limit working-tree searches to the changed paths after `--`; full searches the whole tree. In PowerShell replace
 `cut` with `ForEach-Object { ($_ -split ':')[0..1] -join ':' }` (`[0..2]` for
 the history form). Without Git on Windows use
 `Select-String -Path <files> -Pattern '<pattern>' | ForEach-Object { "$($_.Path):$($_.LineNumber)" }`;
 .NET regular expressions need `\s` instead of `[[:space:]]`.
 
-To classify a candidate, view only its line, masked. The masks hide URL
-passwords, values assigned to sensitive names, and every run of 16 or more
-token characters:
+To classify a candidate, keep its contents inside a local filtering operation.
+Emit only the path, line number, pattern class, and structural facts that do not
+contain values. Withhold the entire candidate line by default (`[REDACTED]`).
+A token-length or sensitive-name regex is not a sufficient redaction guarantee:
+short values, unusual names, split literals, and multiple values can escape it.
 
-```text
-git show :<path> | sed -n '<n>p' | sed -E 's#(://[^/:@[:space:]]+:)[^/@[:space:]]+@#\1[REDACTED]@#g; s/((pass(word|wd)?|pwd|secret|token|key)[a-z0-9_]*["'"'"']?[[:space:]]*[:=][[:space:]]*["'"'"']?)[^"'"'"'[:space:];&,]+/\1[REDACTED]/Ig; s/[A-Za-z0-9+\/=_-]{16,}/[REDACTED]/g'
-(Get-Content <path>)[<n>-1] -replace '(://[^/:@\s]+:)[^/@\s]+@','$1[REDACTED]@' -replace '((pass(word|wd)?|pwd|secret|token|key)\w*["'']?\s*[:=]\s*["'']?)[^"''\s;&,]+','$1[REDACTED]' -replace '[A-Za-z0-9+/=_-]{16,}','[REDACTED]'
-```
+Use partial excerpts only when the local redaction method has been verified for
+that format and removes every sensitive value before tool output. Otherwise,
+use location-only searches and structural descriptions. If these cannot establish
+classification, report the specific uncertainty; do not print raw contents to
+resolve it. Apply the same rule to surrounding lines, diffs, index blobs, and
+historical blobs. Do not write unredacted intermediate files.
 
-The first form (POSIX shell, GNU sed) reads the index; use `<sha>:<path>` for
-a revision or `cat <path>` for a current file. The second form (PowerShell)
-reads a current file; use `git show ":<path>"` instead of `Get-Content` for the
-index. Masking is best effort: a short secret under an unusual name can
-survive it, so classify from the name, file, and neighbouring masked lines
-before viewing more. Masking also hides placeholder words; find them with a
-second location-only search on the same file and compare line numbers:
+Placeholder markers can be checked with a second location-only search:
 `example|sample|dummy|fake|placeholder|changeme|your[_-]|xxxx|<[a-z_-]+>`
-(case-insensitive).
+(case-insensitive). A marker on the same line does not prove that every value
+on that line is harmless or that a placeholder is not used as a real credential.
 
 ## 1. Private keys
 
@@ -112,7 +121,7 @@ holds an effective secret.
 Personal or local data that would be published is WARN (see
 [severity](severity.md)). Case-insensitive:
 
-- absolute user path: `([a-z]:[\/]|/[a-z]/)users[\/][^\/[:space:]]+`,
+- absolute user path: `([a-z]:[\\/]|/[a-z]/)users[\\/][^\\/[:space:]]+`,
   `/(home|Users)/[^/[:space:]]+`
 - email address: `[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}`
 - private IP address: `(10|192\.168|172\.(1[6-9]|2[0-9]|3[01]))\.[0-9]{1,3}\.[0-9]{1,3}`

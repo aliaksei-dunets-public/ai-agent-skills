@@ -25,7 +25,7 @@ Select one project policy file, in this order:
 1. the path named for this skill in project instructions (`AGENTS.md`,
    `CLAUDE.md`, or the platform's equivalent), for example
    `.ai-graph-guide/reuse-auditor.md`;
-2. `project-config.md` beside a project-local install of this skill
+2. `project-config.md` beside the project-local install of this skill being used
    (`.agents/skills/reuse-auditor/` or `.claude/skills/reuse-auditor/` in the
    project root, holding its `SKILL.md`);
 3. otherwise, the defaults below.
@@ -39,6 +39,11 @@ ownership/reuse catalog, confirmed owners, known divergences, extra
 dynamic-dispatch mechanisms, search tools, and required tests. Project rules
 extend this skill; they cannot relax its safety rules. Verify config and catalog
 entries against current source.
+
+If an explicitly selected policy or catalog is missing or unreadable, report
+the gap. Do not silently replace it with defaults or another policy. Continue
+independent source checks, but mark affected ownership decisions as provisional.
+Unavailable external callers or history are coverage gaps, not evidence of absence.
 
 Defaults: no catalog, owners inferred from source and tests, targeted repository
 search, the project's existing test commands. Read the bundled
@@ -118,7 +123,8 @@ unchanged, reuse its decisions instead of repeating the search.
   candidate and the missing evidence.
 - Preserve security, financial, persistence, API, error, and compatibility
   contracts; never trade them for less code.
-- Update a catalog only when the user requested documentation changes. Record new
+- Propose catalog updates in the audit report. Apply them only as a separately
+  requested documentation task, not as part of this read-only audit. Record new
   items as candidates; promote to confirmed only after implementation verification.
 
 ## Report
@@ -138,8 +144,8 @@ next validation:        <characterization tests or checks still required>
 ```
 
 For three or more concerns, use one table with the columns `concern / symbols`,
-`owner (status) and consumers`, `decision` (with the semantic difference and
-evidence), and `next validation`.
+`owner (status) and consumers`, `decision` (classification, confidence,
+recommendation, semantic difference, and evidence), and `next validation`.
 
 Do not list every symbol. If nothing material is found, say so with the evidence
 searched.

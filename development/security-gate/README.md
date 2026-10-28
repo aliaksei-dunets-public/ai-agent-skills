@@ -29,7 +29,7 @@ These are example requests to the agent, not shell commands. "Initial audit" and
 - `WARN`: Medium issues, personal or local data (user paths, personal email, internal hosts), unresolved risks, content that could not be reviewed, or an empty staged scope.
 - `PASS`: nothing blocking or warning in the reviewed scope; this does not guarantee that no vulnerabilities exist.
 
-The report lists findings of every severity with file/line, impact, evidence, a fix, and a way to verify it, plus a separate list of potential risks. A full audit also shows coverage for each project component. Secret values never appear: searches print locations only and matched lines are masked as `[REDACTED]`.
+The report lists findings of every severity with file/line, impact, evidence, a fix, and a way to verify it, plus a separate list of potential risks. A full audit also shows coverage for each project component. Secret searches print locations only. Candidate line contents are withheld by default; partial excerpts require a verified local redaction method. Uncertain classification remains an explicit coverage limit.
 
 The skill uses only its own reading and read-only Git. It does not run scanners, project code, or package managers, does not install anything, and does not apply fixes or commits. Known-vulnerability (CVE) lookup for dependencies is out of scope; use Dependabot or dependency review for it. The skill does check changed dependencies for supply-chain signals such as unpinned versions, Git URLs, or install scripts. The report is returned in chat; a file is created on request.
 
