@@ -3,16 +3,34 @@
 Apply these adapted STE principles in context. Use the priorities and the
 behavior contract in [SKILL.md](../SKILL.md).
 
+Sections: Accuracy, Sentences and actions, Words and terminology, Voice and
+responsibility, Conditions and ambiguity, Repetition and structure, Minimal
+edits, Final comparison.
+
 ## Accuracy
 
 Check statements about code, commands, paths, versions, and behavior against
-the available sources. Do not present an assumption as a fact. If you cannot
-check a statement, keep it out of the text or mark it as unchecked.
+the available sources. Do not present an assumption as a fact.
+
+- `create`: do not invent a value. Leave out an unchecked fact that the reader
+  does not need. The reader needs a fact when a required action cannot be
+  performed without it, such as a command the text tells the agent to run
+  when neither the request nor the available files identify that command. Then insert a clearly
+  marked placeholder or a visible "unverified" note in the text, and list the
+  fact in the report.
+- `edit` and `review`: if you cannot check a statement, or a source
+  contradicts it, do not change its claim. Report it as a suspected technical
+  error and name the contradicting source, if any; a contradiction with
+  another file is reported, not resolved. Language fixes that keep the claim,
+  such as a spelling correction, are allowed.
 
 ## Sentences and actions
 
 Prefer short sentences with one main idea. Split a sentence only when this
-improves understanding. Keep each condition attached to every action it governs.
+improves understanding. Keep each condition attached to every action it governs:
+when one condition governs several actions, keep it in one sentence or use a
+lead-in with the condition and a list of the actions, as below; do not split
+the actions into separate sentences that lose the condition.
 Use numbered lists for ordered actions, bullets for independent items, and
 paragraphs for connected explanations. Do not turn every sentence into a list.
 
@@ -50,8 +68,15 @@ Before: "The configuration must be checked by the agent."
 After: "The agent must check the configuration."
 
 Keep the actor explicit when several people or agents have different duties.
+If a passive sentence does not name the actor, do not add one; report the
+missing actor when it matters. An actor that the imperatives of the same
+instruction address counts as named.
+
 Do not turn a recommendation into a command: "The agent should check the
-configuration" must remain a recommendation.
+configuration" must remain a recommendation. Use one modal word for each
+requirement strength in a document, for example `must`, `should`, and `may`.
+If the intended strength of a word such as "need to" is unclear, report it
+instead of changing it.
 
 ## Conditions and ambiguity
 
@@ -73,6 +98,8 @@ outside a language edit.
 Remove repetition only when it adds no meaning. Keep repeated information
 needed for independent use, safety, error prevention, or understanding without
 external context. Preserve a suitable document structure and section names.
+When you translate to English, translate headings and report links that point
+to them.
 Use headings to separate topics and tables to compare structured information.
 Do not add sections or impose a common template without a concrete need.
 
@@ -83,23 +110,8 @@ For example, leave "Read the request and identify the goal" unchanged: it is
 already short, clear, and unambiguous.
 
 Preserve code, commands, identifiers, paths, and data formats exactly during
-language edits. A suspected technical error is a separate finding, not a reason
-to silently change a technical token.
-
-## Russian text
-
-Apply the same rules to Russian text. Do not translate a document merely to
-apply these principles. Also check these Russian-specific problems:
-
-- Chains of verbal nouns: replace "осуществить проведение проверки" with
-  "проверить".
-- Passive forms that hide the actor: replace "конфигурация проверяется" with
-  "агент проверяет конфигурацию" when the actor matters.
-- Inconsistent modal words: keep one wording for each requirement strength in
-  the document, for example "необходимо" for `must`, "следует" for `should`,
-  and "можно" for `may`. Do not change the strength when you change the word.
-- Mixed instruction forms: use one form in a list, either the imperative
-  ("проверьте") or the infinitive ("проверить").
+language edits. A suspected technical error is a separate finding. Do not
+change the technical token in a language edit, even if you report the change.
 
 ## Final comparison
 

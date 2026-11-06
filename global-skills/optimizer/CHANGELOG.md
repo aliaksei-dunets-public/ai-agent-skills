@@ -1,5 +1,140 @@
 # Changelog
 
+## 2.3.0 — 2026-11-06
+
+- Loading:
+  - Added a Resources table in `SKILL.md` that states when each file loads;
+    references repeat only their own load condition.
+  - `technical-writing-ste` is used in `review` mode at steps 3–4 and in
+    `edit` mode at step 5; its writing rules are linked directly.
+  - `platforms.md` loads only when a check or finding needs a platform fact the
+    package does not state, or must verify one that it states (for example,
+    an installation path).
+- Audience and language: a new section in `SKILL.md` separates agent-facing
+  from human-facing text.
+  - Agent-facing text must be in English. Quoted user phrases, examples of
+    non-English input or output, and literal output templates are exceptions.
+    Other non-English agent-facing text is a finding; `fix` translates it
+    under the `technical-writing-ste` behavior contract.
+  - `technical-writing-ste` applies to agent-facing text only. Human-facing
+    text keeps its language and style and is checked for accuracy and
+    consistency. Files are classified by type and location (an unlinked file
+    in `references/` is agent-facing); a file whose audience is still unclear
+    is treated as human-facing, and this classification takes precedence over
+    the dependency's own rule. Examples and literal output templates are
+    checked against the rules they illustrate, not against STE wording rules.
+  - `technical-writing-ste` now states the same scope in its `description`
+    and workflow; the optimizer `description` and guide refer wording-only
+    edits or reviews of agent-facing text, in one file or several, to it.
+  - The optimizer `description` no longer names `prompter`; it states that a
+    single standalone prompt is out of scope, so the boundary holds when
+    `prompter` is not installed. The `technical-writing-ste` description
+    likewise names no sibling skill: it defines wording (sentence clarity,
+    terms, grammar, punctuation, ambiguous phrasing, repetition or list
+    layout within the text) and excludes prompt task design and package
+    audits.
+  - The `prompter` description is in third person, names no sibling skill,
+    and excludes checking or editing only the wording of a prompt. The optimizer
+    description defines weak instructions (missing conditions, failure
+    handling, or controls), separating them from unclear wording.
+  - `technical-writing-ste` writing rules: when a placeholder is needed in
+    `create`; a contradiction with another file is reported, not resolved;
+    one condition over several actions stays in one sentence or a lead-in
+    list; an actor addressed by imperatives counts as named; a clear passive
+    condition is kept.
+  - `technical-writing-ste`: `create` is triggered when the content is given;
+    proofreading, rewriting, simplifying, and translating agent-facing text to
+    English are `edit` requests, checking and reviewing are `review`; `review` lists
+    suspected technical errors separately; a mixed document stops only when
+    all of it is human-facing, and the output names the human-facing
+    sections left unchanged.
+- Moved the fix and verify steps into the new `references/fix.md`, which loads
+  only in `fix` mode. Moved the instruction-design criteria of
+  `references/best-practices.md` that the checklist and `technical-writing-ste`
+  did not already cover into the checklist, dropped the duplicates, and
+  removed `best-practices.md`.
+- Constraints on proposed fixes that `audit` also needs (relocating misplaced
+  content instead of deleting it; keeping the grammatical person of a
+  `description`) are in the Repair principles.
+- Added a Repair principles section in `SKILL.md`, which binds proposed fixes
+  in `audit` and applied fixes in `fix`: preservation, no template
+  restructuring, platform guidance as recommendations, consumer scope.
+  `fix` updates affected documents only within the requested scope.
+- Functional repairs:
+  - The load map is built only when size, context cost, or performance is in
+    question, or when a file loads on every run but only some tasks use it.
+  - Consumer search is limited to the package name, folder name, and
+    entry-point path in the containing repository.
+  - `audit` is the default for any request that names no mode. A general
+    approval applies the proposals of findings not marked as needing a
+    decision and does not decide the marked findings.
+  - An unanswered contradiction that affects safety, approval, or external
+    actions gets the more restrictive rule as an interim fix: proposed in
+    `audit`, applied in `fix` (Repair principles). The same applies to a
+    missing control on such an action when any file of the package states the
+    restrictive option.
+  - Fixes do not invent missing facts (link targets, version history,
+    identifiers, criteria). Release metadata that already disagrees is left
+    unchanged and marked as needing a decision.
+  - Removing misplaced content moves the information its new home lacks
+    instead of deleting it; only the part that conflicts with its new home
+    stays in place, as needing a decision. Information whose only new home is
+    release metadata that already disagrees stays in place.
+  - A broken link is repointed only when the package identifies the target; a
+    file with similar content is not enough.
+  - Severity: critical means the workflow cannot complete, or a defect
+    (including a contradiction) can lead to unsafe, irreversible, or
+    unapproved external action; a contradiction without such impact, or a
+    broken reference the workflow can continue without, is high.
+  - The package boundary is the entry-point folder; files outside it are
+    consumers.
+  - In `fix`, unanswered questions from the audit are repeated with their
+    finding numbers, and findings can be marked "partly fixed". `fix` does
+    not stop to wait for an answer (step 4); open questions go to Questions.
+  - Changes made while release metadata is inconsistent are listed in Checks.
+- Findings carry a type (`functional`, `structural`, or `language`), defined
+  by observable effect (a changed invocation identifier such as `name` is
+  functional; unclear cases default to functional), and "why it matters".
+  "Material" is defined. `Changes` appears only in `fix` mode, and `audit`
+  ends with a one-line `fix` offer.
+- Duplicate handling:
+  - Step 2 traces exact copies of hard rules.
+  - Step 3 compares rules by subject (meaning, condition, limit, requirement
+    strength) for subjects in candidate findings, as a working note.
+  - The checklist classifies similar rules and maps each class to a fix:
+    copy, drift, subsumption, independent-executor repetition, co-loaded
+    repetition with a stated reason, and human-facing summary. It also gives
+    an ordered procedure for choosing the canonical copy: load filter, class,
+    layer scope, topic owner, then step owner. The first decisive item wins.
+    Copies in consumers outside the package are reported unless in scope.
+  - Clearly marked placeholders in examples, and `platforms.md` facts labeled
+    as unchecked, are not invented facts; a file with similar content does
+    not identify a link target.
+  - Findings that need a decision are marked in both modes, with the interim
+    fix proposed (`audit`) or applied (`fix`), or "no interim fix" and why.
+- Structure checks (checklist §2):
+  - a reference loaded at the start when only a later step uses it is a
+    candidate finding;
+  - a reference section order, not a template;
+  - activation conditions belong in `description`;
+  - references state their scope and load condition;
+  - a table of contents above about 100 lines;
+  - installation and history stay out of the entry point;
+  - cross-file pointers use section headings.
+- Checklist:
+  - §5 points to the `technical-writing-ste` rules instead of restating them.
+  - §6 checks mode-specific content in always-loaded files and references
+    that load nearly every run.
+  - Step 3 points to the checklist's section list instead of restating it.
+- `platforms.md`:
+  - Re-verified against current platform documentation. Antigravity skills
+    now use `.agents/skills`. Added user-level skill paths and Claude Code
+    `AGENTS.md` handling.
+  - Added Anthropic authoring recommendations and the Codex metadata budget.
+  - Added a fallback for facts that cannot be verified.
+- Descriptions of optimizer and `technical-writing-ste` are now in third
+  person.
+
 ## 2.2.1 — 2026-10-28
 
 - Synchronized `VERSION` with this release; it remained at 2.1.0 after the

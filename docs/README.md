@@ -3,7 +3,7 @@
 Table of contents for project documentation.
 
 - [Technical Writing STE](../global-skills/technical-writing-ste/SKILL.md):
-  adapted STE principles for technical text and behavior-preserving edits.
+  adapted STE principles for agent-facing text and behavior-preserving edits.
 - [Optimizer guide](../global-skills/optimizer/GUIDE.md): package review and
   repair, including the Technical Writing STE dependency and installation.
 - [Coding discipline](../development/coding-discipline/SKILL.md): scoped

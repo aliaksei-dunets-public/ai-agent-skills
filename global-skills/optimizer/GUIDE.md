@@ -5,7 +5,9 @@ definitions, always-on instruction files, references, examples, and their
 documentation — the way an experienced prompt engineer would: it finds what is
 broken, inconsistent, contradictory, duplicated, or unclear, and then fixes it.
 
-For a single standalone prompt, use the `prompter` skill instead.
+For a single standalone prompt, a prompt-authoring skill such as `prompter`
+fits better. For wording-only edits or reviews of agent-facing text, in one
+file or several, use `technical-writing-ste`.
 
 ## What it checks
 
@@ -20,23 +22,31 @@ For a single standalone prompt, use the `prompter` skill instead.
 - **Documentation:** current documentation and existing release metadata agree.
   Historical changelog entries retain their original context; packages without
   versioning do not need to adopt it for an edit.
-- **Language:** adapted STE principles from `technical-writing-ste` identify
-  unclear wording. Language edits preserve meaning and behavior, including
-  requirement strength and conditions. Functional repairs are reported separately.
-- **Fit and footprint:** defaults that match the workflows calling the package,
-  rules not hidden in conditionally loaded files, and instruction-file bytes
-  for typical and maximum loading scenarios. Files inspected as audit material
-  are recorded separately, with overlaps identified. These byte counts do not
-  measure total context cost or token usage.
+- **Language:** agent-facing text (skills, references, agent definitions,
+  instruction files) must be in English; quoted user phrases, examples, and
+  literal output templates may keep another language. Adapted STE principles
+  from `technical-writing-ste` identify unclear wording in agent-facing text
+  only. Human-facing documentation, such as a README or this guide, keeps its
+  language and style and is checked for accuracy and consistency. Language
+  edits and translations preserve meaning and behavior, including requirement
+  strength and conditions. Functional repairs are reported separately.
+- **Fit and footprint:** defaults that match the workflows calling the package
+  and rules not hidden in conditionally loaded files. When size or context cost
+  is in question, a load map gives instruction-file bytes for typical and
+  maximum loading scenarios; these byte counts do not measure total context
+  cost or token usage.
 
-The full list is in `references/checklist.md`; the rules used when rewriting
-are in `references/best-practices.md`; platform notes (Codex, Claude Code,
-Copilot, Antigravity) are in `references/platforms.md`.
+The full list, including instruction-design criteria, is in
+`references/checklist.md`; the fix and verification steps are in
+`references/fix.md`; platform notes (Codex, Claude Code, Copilot, Antigravity)
+are in `references/platforms.md`.
 
 ## Modes
 
 - **audit** — findings and proposed fixes, no changes.
 - **fix** — audit, then apply the fixes and update related documentation.
+
+If a request names no mode, optimizer runs `audit` and offers `fix`.
 
 ## Example requests
 
@@ -47,34 +57,28 @@ Copilot, Antigravity) are in `references/platforms.md`.
 
 ## What you get
 
-1. **Findings** — severity, location, problem, fix;
+1. **Findings** — severity, type (`functional`, `structural`, or `language`),
+   location, problem, why it matters, fix; findings that need your decision
+   are marked, with any interim fix;
 2. **Changes** — files changed (fix mode);
 3. **Questions** — only decisions that need you, such as which side of a
-   contradiction is intended;
-4. **Checks** — what was verified after the changes.
+   contradiction is intended; `fix` does not stop to wait for them;
+4. **Checks** — what was verified and what was not covered;
+5. **Offer** — after an audit, one line offering `fix`.
 
-Optimizer keeps the author's intent, capabilities, language, and safety
-requirements, changes only what its findings justify, and does not claim
-measured improvements it did not measure.
-
-Shared rules have a canonical source, but necessary repetition remains when
-independent executors need it. References load under their stated conditions
-or for a specific audit finding; justified cross-skill dependencies may span
-more than one reference level.
-
-For large packages, it inventories paths and inspects coherent workflow batches.
-Reports state inspected/deferred/unreadable areas; a partial batch is not a
-complete audit. Exhaustive requests continue across batches, and fixes include
-affected incoming links and governing documents without loading unrelated files.
+Optimizer keeps the author's intent, capabilities, and safety requirements, and
+the language of human-facing documentation. It changes only what its findings
+justify and does not claim measured improvements it did not measure. For large
+packages, it inspects coherent batches and reports which areas were not covered.
 
 ## Installation
 
 Copy the `optimizer` folder into the skill directory of your platform, for
-example `.claude/skills/optimizer/`, `.agents/skills/optimizer/`,
-`.github/skills/optimizer/`, or `.agent/skills/optimizer/`.
+example `.claude/skills/optimizer/`, `.agents/skills/optimizer/`, or
+`.github/skills/optimizer/`.
 
 Copy `technical-writing-ste` into the same parent directory so the two skill
 folders are siblings. Keep its `references/` directory. Optimizer reads this
-dependency for content review and language edits in both modes; `audit` still
-changes no files. If the dependency is missing, optimizer continues the other
-checks and reports the incomplete STE work.
+dependency to review agent-facing text in both modes and for language edits in
+`fix`; `audit` changes no files. If the dependency is missing, optimizer
+continues the other checks and reports the incomplete STE work.

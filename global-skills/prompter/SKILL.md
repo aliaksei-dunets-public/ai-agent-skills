@@ -1,11 +1,13 @@
 ---
 name: prompter
 description: >
-  Create, improve, audit, or explore prompts for LLMs. Use when the requested
-  deliverable is a prompt, prompt critique, or reusable prompt template. Preserve
-  the user's intent and target capabilities; do not perform the domain task
-  described inside a prompt unless separately requested. For auditing a package
-  of skills or instructions use optimizer.
+  Creates, improves, audits, or explores prompts for LLMs. Use when the
+  requested deliverable is a prompt, a critique of a prompt's task design
+  (inputs, output contract, structure), or a reusable prompt template.
+  Preserves the user's intent and target capabilities; does not perform the
+  domain task described inside a prompt unless separately requested. Not for
+  checking or editing only the wording of a prompt, or for auditing a package
+  of skills or instructions.
 ---
 
 # Prompt Architect
